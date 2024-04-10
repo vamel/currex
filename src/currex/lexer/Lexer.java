@@ -25,7 +25,6 @@ public class Lexer {
             nextCharacter();
         }
 
-//        source.skipWhitespaces();
         while (Character.isWhitespace(currentChar)) {
             nextCharacter();
         }
@@ -38,7 +37,7 @@ public class Lexer {
             return token;
         }
         nextCharacter();
-        return null;
+        return new Token(new Position(source.getPosition()), TokenType.UNKNOWN);
     }
 
     private boolean tryBuildOperator() {
@@ -72,7 +71,6 @@ public class Lexer {
         if (LexerMapping.twoCharacterOperatorsMap.containsKey(operator.toString())) {
             nextCharacter();
             token = new Token(position, LexerMapping.twoCharacterOperatorsMap.get(operator.toString()));
-            System.out.println(token);
             return true;
         }
         return false;
@@ -81,7 +79,6 @@ public class Lexer {
     private boolean buildSingleSignedOperator(char character, Position position) {
         nextCharacter();
         token = new Token(position, LexerMapping.singleCharacterOperatorsMap.get(character));
-        System.out.println(token);
         return true;
     }
 
@@ -122,7 +119,6 @@ public class Lexer {
         } else {
             token = new IntegerToken(tokenPosition, integerValue);
         }
-//        System.out.println(token);
         return true;
     }
 
@@ -151,7 +147,6 @@ public class Lexer {
         } else {
             token = new StringToken(tokenPosition, tokenValue, TokenType.IDENTIFIER);
         }
-//        System.out.println(token);
         return true;
     }
 
@@ -170,7 +165,6 @@ public class Lexer {
             stringLiteral.append(currentChar);
             if (stringLiteral.toString().length() > MAX_STRING_LENGTH) {
                 System.out.println("TOO LONG STRING!");
-                System.out.println(stringLiteral);
                 isFinished = true;
             } else if (currentChar == '\"' && stringLiteral.charAt(stringLiteral.length()-2) != '\\') {
                 token = new StringToken(tokenPosition, stringLiteral.toString(), TokenType.STRING_VALUE);
@@ -184,7 +178,6 @@ public class Lexer {
             }
             nextCharacter();
         }
-//        System.out.println(token);
         return true;
     }
 
@@ -207,7 +200,6 @@ public class Lexer {
             } else {
                 token = new Token(tokenPosition, TokenType.SLASH);
             }
-//        System.out.println(token);
         return true;
     }
 
