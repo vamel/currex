@@ -4,19 +4,14 @@ public class Position {
     private int row;
     private int column;
 
-    public Position(int column, int row) {
-        this.row = row;
-        this.column = column;
+    public Position() {
+        this.row = 1;
+        this.column = 0;
     }
 
     public Position(Position position) {
         this.row = position.row;
         this.column = position.column;
-    }
-
-    public Position() {
-        this.row = 1;
-        this.column = 0;
     }
 
     public void moveToNextRow() {
@@ -26,6 +21,14 @@ public class Position {
 
     public void moveToNextColumn() {
         column++;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getColumn() {
+        return column;
     }
 
     @Override

@@ -1,0 +1,2 @@
+bool true_val = true;
+bool false_val = false;

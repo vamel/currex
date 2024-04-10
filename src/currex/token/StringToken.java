@@ -16,8 +16,8 @@ public class StringToken extends Token {
     @Override
     public String toString() {
         return  "StringToken{" +
-                "tokenType=" + this.getTokenType() +
-                ", " + this.getPosition() +
+                "tokenType=" + getTokenType() +
+                ", " + getPosition() +
                 ", value=" + value + "}";
     }
 }

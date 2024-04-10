@@ -21,10 +21,6 @@ public class Token {
         return tokenType;
     }
 
-    public void setTokenType(TokenType tokenType) {
-        this.tokenType = tokenType;
-    }
-
     @Override
     public String toString() {
         return "Token{" +

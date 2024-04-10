@@ -1,23 +1,26 @@
 package currex.lexer;
 
-import currex.sourcereader.SourceReader;
+import currex.lexer.error.*;
+import currex.source.Source;
 import currex.token.*;
+import currex.utils.CurrexLimits;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Lexer {
-    private final int MAX_IDENTIFIER_LENGTH = 100;
-    private final int MAX_STRING_LENGTH = 100;
-    private final int INTEGER_MAX_VALUE = Integer.MAX_VALUE;
-    private final SourceReader source;
+    private final Source source;
     private Character currentChar;
     private Token token;
+    private ErrorHandler errorHandler;
 
-    public Lexer(SourceReader source) {
+    public Lexer(Source source) {
         this.source = source;
         this.currentChar = null;
         this.token = null;
+        this.errorHandler = new ErrorHandler();
     }
 
     public Token fetchToken() {
@@ -37,6 +40,8 @@ public class Lexer {
             return token;
         }
         nextCharacter();
+        errorHandler.handleLexerError(new UnknownTokenError("UNKNOWN TOKEN FOUND!"),
+                new Position(source.getPosition()));
         return new Token(new Position(source.getPosition()), TokenType.UNKNOWN);
     }
 
@@ -59,6 +64,10 @@ public class Lexer {
 
         if (possibleFirstSigns.contains(firstSign) && possibleLastSigns.contains(nextSign)) {
             return buildDoubleSignedOperator(firstSign, nextSign, tokenPosition);
+        } else if ((firstSign == '&' || firstSign == '|') && firstSign != nextSign) {
+            errorHandler.handleLexerError(new MissingSecondCharacterError("MISSING SECOND CHARACTER ERROR"),
+                    new Position(source.getPosition()));
+            return false;
         } else {
             return buildSingleSignedOperator(firstSign, tokenPosition);
         }
@@ -92,10 +101,11 @@ public class Lexer {
         nextCharacter();
         while (Character.isDigit(currentChar)) {
             int charValue = currentChar - '0';
-            if (integerValue <= (INTEGER_MAX_VALUE - charValue)/10) {
+            if (integerValue <= (CurrexLimits.INTEGER_MAX_VALUE - charValue)/10) {
                 integerValue = integerValue * 10 + charValue;
             } else {
-                System.out.println("INTEGER NUMBER IS TOO BIG!");
+                errorHandler.handleLexerError(new TooBigIntegerError("INTEGER IS TOO BIG!"),
+                        new Position(source.getPosition()));
             }
             nextCharacter();
         }
@@ -106,16 +116,20 @@ public class Lexer {
             short decimalCounter = 0;
             while (Character.isDigit(currentChar)) {
                 int charValue = currentChar - '0';
-                if (decimalCounter <= 10) {
+                if (decimalCounter <= CurrexLimits.MAXIMUM_DECIMAL_PLACES) {
                     decimalValue = decimalValue * 10 + charValue;
                     decimalCounter++;
                 } else {
-                    System.out.println("FLOAT NUMBER IS TOO BIG!");
+                    errorHandler.handleLexerError(new FloatingPointError("FLOAT NUMBER IS TOO BIG!"),
+                            new Position(source.getPosition()));
                 }
                 nextCharacter();
             }
             double totalValue = integerValue + decimalValue / Math.pow(10, decimalCounter);
+            BigDecimal toRound = new BigDecimal(Double.toString(totalValue));
+            totalValue = toRound.setScale(10, RoundingMode.HALF_UP).doubleValue();
             token = new FloatToken(tokenPosition, totalValue);
+            System.out.println(token);
         } else {
             token = new IntegerToken(tokenPosition, integerValue);
         }
@@ -133,11 +147,12 @@ public class Lexer {
         nextCharacter();
 
         while ((Character.isLetterOrDigit(currentChar) || currentChar == '_')
-                && identifier.length() <= MAX_IDENTIFIER_LENGTH) {
+                && identifier.length() <= CurrexLimits.MAX_IDENTIFIER_LENGTH) {
             identifier.append(currentChar);
             nextCharacter();
-            if (identifier.length() == MAX_IDENTIFIER_LENGTH && !source.isStreamEnd()) {
-                System.out.println("IDENTIFIER TOO LONG");
+            if (identifier.length() == CurrexLimits.MAX_IDENTIFIER_LENGTH && !source.isStreamEnd()) {
+                errorHandler.handleLexerError(new IdentifierTooLongError("TOO LONG IDENTIFIER!"),
+                        new Position(source.getPosition()));
             }
         }
 
@@ -163,8 +178,9 @@ public class Lexer {
 
         while (!isFinished) {
             stringLiteral.append(currentChar);
-            if (stringLiteral.toString().length() > MAX_STRING_LENGTH) {
-                System.out.println("TOO LONG STRING!");
+            if (stringLiteral.toString().length() > CurrexLimits.MAX_STRING_LENGTH) {
+                errorHandler.handleLexerError(new StringTooLongError("TOO LONG STRING!"),
+                        new Position(source.getPosition()));
                 isFinished = true;
             } else if (currentChar == '\"' && stringLiteral.charAt(stringLiteral.length()-2) != '\\') {
                 token = new StringToken(tokenPosition, stringLiteral.toString(), TokenType.STRING_VALUE);

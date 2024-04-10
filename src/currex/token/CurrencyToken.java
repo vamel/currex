@@ -7,13 +7,13 @@ public class CurrencyToken extends Token {
     private final String currencyType;
 
     public CurrencyToken(Position position, Double value, String currencyType) {
-        super(position, TokenType.CURRENCY);
+        super(position, TokenType.CURRENCY_VALUE);
         this.value = BigDecimal.valueOf(value);
         this.currencyType = currencyType;
     }
 
-    public BigDecimal getValue() {
-        return this.value;
+    public double getValue() {
+        return this.value.doubleValue();
     }
 
     public String getCurrencyType() {
@@ -22,9 +22,11 @@ public class CurrencyToken extends Token {
 
     @Override
     public String toString() {
-        return super.toString() + "CurrencyToken{" +
-                "value=" + value +
-                ", currencyType='" + currencyType + '\'' +
+        return "CurrencyToken{" +
+                "tokenType=" + getTokenType() +
+                ", " + getPosition() +
+                ", value=" + getValue() +
+                ", currencyType='" + getCurrencyType() + '\'' +
                 '}';
     }
 }

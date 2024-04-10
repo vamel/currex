@@ -1,4 +1,4 @@
-package currex.sourcereader;
+package currex.source;
 
 import currex.token.Position;
 
@@ -6,14 +6,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 
-public class SourceReader {
+public class Source {
     private final Reader reader;
     private final Position position;
     private boolean isEOF;
     private Character currentChar = null;
     private Character nextChar;
 
-    public SourceReader(Reader reader) throws IOException {
+    public Source(Reader reader) throws IOException {
         this.position = new Position();
         this.reader = new BufferedReader(reader);
         this.nextChar = this.readNextChar();

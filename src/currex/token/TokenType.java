@@ -45,7 +45,7 @@ public enum TokenType {
     BOOLEAN,
     CURRENCY,
 
-    INT_VALUE,
+    INTEGER_VALUE,
     FLOAT_VALUE,
     STRING_VALUE,
     CURRENCY_VALUE,
