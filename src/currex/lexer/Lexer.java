@@ -25,7 +25,10 @@ public class Lexer {
             nextCharacter();
         }
 
-        source.skipWhitespaces();
+//        source.skipWhitespaces();
+        while (Character.isWhitespace(currentChar)) {
+            nextCharacter();
+        }
 
         if (tryBuildIdentifier() ||
             tryBuildNumber() ||
@@ -65,6 +68,7 @@ public class Lexer {
     private boolean buildDoubleSignedOperator(char first, char second, Position position) {
         StringBuilder operator = new StringBuilder();
         operator.append(first).append(second);
+        nextCharacter();
         if (LexerMapping.twoCharacterOperatorsMap.containsKey(operator.toString())) {
             nextCharacter();
             token = new Token(position, LexerMapping.twoCharacterOperatorsMap.get(operator.toString()));
@@ -80,59 +84,6 @@ public class Lexer {
         System.out.println(token);
         return true;
     }
-
-//    private boolean tryBuildOperator() {
-//        if (!LexerMapping.singleCharacterOperatorsMap.containsKey(currentChar)
-//            && currentChar != '&' && currentChar != '|') {
-//            return false;
-//        }
-//
-//        Set<Character> firstSigns = LexerMapping.twoCharacterOperatorsMap.keySet()
-//                .stream().map(operator -> operator.substring(0, 1).charAt(0))
-//                .collect(Collectors.toSet());
-//
-//        Set<Character> d = LexerMapping.singleCharacterOperatorsMap.keySet()
-//                .stream().filter(firstSigns::contains)
-//                .collect(Collectors.toSet());
-//
-//        char firstSign = currentChar;
-//        Position tokenPosition = new Position(source.getPosition());
-//        StringBuilder operator = new StringBuilder();
-//        operator.append(currentChar);
-//        Character nextSign = source.Peek();
-//        System.out.println("CURRENT: " + currentChar);
-//        System.out.println("NEXT: " + nextSign);
-//
-//        if (firstSigns.contains(firstSign)) {
-//            if (nextSign != null) {
-//                operator.append(nextSign);
-//                return tryBuildDoubleCharacterOperator(operator.toString(), tokenPosition);
-//            }
-//        } else {
-//            return tryBuildSingleCharacterOperator(firstSign, tokenPosition);
-//        }
-//        return false;
-//    }
-//
-//    private boolean tryBuildDoubleCharacterOperator(String operator, Position tokenPosition) {
-//        if (LexerMapping.twoCharacterOperatorsMap.containsKey(operator)) {
-//            nextCharacter();
-//            token = new Token(tokenPosition, LexerMapping.twoCharacterOperatorsMap.get(operator));
-//            System.out.println(token);
-//            return true;
-//        } else {
-//            return tryBuildSingleCharacterOperator(currentChar, tokenPosition);
-//        }
-//    }
-//
-//    private boolean tryBuildSingleCharacterOperator(char operator, Position tokenPosition) {
-//        if (LexerMapping.singleCharacterOperatorsMap.containsKey(operator)) {
-//           token = new Token(tokenPosition, LexerMapping.singleCharacterOperatorsMap.get(operator));
-//           System.out.println(token);
-//           return true;
-//       }
-//       return false;
-//    }
 
     private boolean tryBuildNumber() {
         if (!Character.isDigit(currentChar)) {

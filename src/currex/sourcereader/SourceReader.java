@@ -8,7 +8,7 @@ import java.io.Reader;
 
 public class SourceReader {
     private final Reader reader;
-    private Position position;
+    private final Position position;
     private boolean isEOF;
     private Character currentChar = null;
     private Character nextChar;
@@ -28,26 +28,10 @@ public class SourceReader {
         return nextChar;
     }
 
-    public void skipWhitespaces() {
-        try {
-            while (Character.isWhitespace(nextChar)) {
-                nextChar = readNextChar();
-                if (nextChar == '\n') {
-                    position.moveToNextRow();
-                }
-                else {
-                    position.moveToNextColumn();
-                }
-            }
-        } catch (IOException ignored) {
-        }
-    }
-
-    public Character readNextChar() throws IOException {
+    private char readNextChar() throws IOException {
         int newChar = reader.read();
         if (newChar == -1) {
             isEOF = true;
-            return null;
         }
         return (char) newChar;
     }
@@ -65,24 +49,8 @@ public class SourceReader {
         }
     }
 
-    public char readCharX() {
-        skipWhitespaces();
-        try {
-            this.currentChar = this.nextChar;
-            this.nextChar = readNextChar();
-            if (this.currentChar == '\n') {
-                this.position.moveToNextRow();
-            } else {
-                this.position.moveToNextColumn();
-            }
-            return this.currentChar;
-        } catch (IOException e) {
-            return 'z';
-        }
-    }
-
     public boolean isStreamEnd() {
-        return isEOF && nextChar == null;
+        return isEOF;
     }
 
     public Position getPosition() {
