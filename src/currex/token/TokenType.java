@@ -16,7 +16,7 @@ public enum TokenType {
     GREATER,
     LESSER_OR_EQUAL,
     GREATER_OR_EQUAL,
-    NOT_EQUAL,
+    INEQUALITY,
     EQUALITY,
 
     TRUE,
@@ -42,7 +42,7 @@ public enum TokenType {
     INTEGER,
     FLOAT,
     STRING,
-    BOOLEAN,
+    BOOL,
     CURRENCY,
 
     INTEGER_VALUE,
@@ -54,5 +54,11 @@ public enum TokenType {
 
     COMMENT,
 
-    UNKNOWN
+    UNKNOWN,
+    TOO_LONG_STRING_ERROR,
+    TOO_LONG_IDENTIFIER_ERROR,
+    TOO_BIG_INTEGER_ERROR,
+    FLOATING_POINT_ERROR,
+    MISSING_SECOND_CHARACTER_ERROR
+
 }

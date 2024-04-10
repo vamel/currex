@@ -32,7 +32,7 @@ public class LexerMapping {
     public static final Map<String, TokenType> twoCharacterOperatorsMap = Map.ofEntries(
             entry("<=", TokenType.LESSER_OR_EQUAL),
             entry(">=", TokenType.GREATER_OR_EQUAL),
-            entry("!=", TokenType.NOT_EQUAL),
+            entry("!=", TokenType.INEQUALITY),
             entry("==", TokenType.EQUALITY),
             entry("&&", TokenType.AND),
             entry("||", TokenType.OR),
@@ -47,7 +47,7 @@ public class LexerMapping {
             entry("int", TokenType.INTEGER),
             entry("float", TokenType.FLOAT),
             entry("string", TokenType.STRING),
-            entry("bool", TokenType.BOOLEAN),
+            entry("bool", TokenType.BOOL),
             entry("currency", TokenType.CURRENCY),
             entry("true", TokenType.TRUE),
             entry("false", TokenType.FALSE)

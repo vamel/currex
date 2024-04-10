@@ -42,7 +42,7 @@ public class Lexer {
         nextCharacter();
         errorHandler.handleLexerError(new UnknownTokenError("UNKNOWN TOKEN FOUND!"),
                 new Position(source.getPosition()));
-        return new Token(new Position(source.getPosition()), TokenType.UNKNOWN);
+        return new ErrorToken(new Position(source.getPosition()), TokenType.UNKNOWN);
     }
 
     private boolean tryBuildOperator() {
@@ -67,7 +67,8 @@ public class Lexer {
         } else if ((firstSign == '&' || firstSign == '|') && firstSign != nextSign) {
             errorHandler.handleLexerError(new MissingSecondCharacterError("MISSING SECOND CHARACTER ERROR"),
                     new Position(source.getPosition()));
-            return false;
+            token = new ErrorToken(tokenPosition, TokenType.MISSING_SECOND_CHARACTER_ERROR);
+            return true;
         } else {
             return buildSingleSignedOperator(firstSign, tokenPosition);
         }
@@ -106,6 +107,8 @@ public class Lexer {
             } else {
                 errorHandler.handleLexerError(new TooBigIntegerError("INTEGER IS TOO BIG!"),
                         new Position(source.getPosition()));
+                token = new ErrorToken(tokenPosition, TokenType.TOO_BIG_INTEGER_ERROR);
+                return true;
             }
             nextCharacter();
         }
@@ -122,6 +125,8 @@ public class Lexer {
                 } else {
                     errorHandler.handleLexerError(new FloatingPointError("FLOAT NUMBER IS TOO BIG!"),
                             new Position(source.getPosition()));
+                    token = new ErrorToken(tokenPosition, TokenType.FLOATING_POINT_ERROR);
+                    return true;
                 }
                 nextCharacter();
             }
@@ -152,6 +157,8 @@ public class Lexer {
             if (identifier.length() == CurrexLimits.MAX_IDENTIFIER_LENGTH && !source.isStreamEnd()) {
                 errorHandler.handleLexerError(new IdentifierTooLongError("TOO LONG IDENTIFIER!"),
                         new Position(source.getPosition()));
+                token = new ErrorToken(tokenPosition, TokenType.TOO_LONG_IDENTIFIER_ERROR);
+                return true;
             }
         }
 
@@ -180,6 +187,7 @@ public class Lexer {
             if (stringLiteral.toString().length() > CurrexLimits.MAX_STRING_LENGTH) {
                 errorHandler.handleLexerError(new StringTooLongError("TOO LONG STRING!"),
                         new Position(source.getPosition()));
+                token = new ErrorToken(tokenPosition, TokenType.TOO_LONG_STRING_ERROR);
                 isFinished = true;
             } else if (currentChar == '\"' && stringLiteral.charAt(stringLiteral.length()-2) != '\\') {
                 token = new StringToken(tokenPosition, stringLiteral.toString(), TokenType.STRING_VALUE);
