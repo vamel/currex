@@ -63,7 +63,7 @@ public class TokenTest {
     public void integerTokenTest() {
         IntegerToken token = new IntegerToken(new Position(), 10000);
         Assert.assertEquals(token.getTokenType(), TokenType.INTEGER_VALUE);
-        Assert.assertEquals(token.getValue(), 10000);
+        Assert.assertEquals(token.getValue(), Integer.valueOf(10000));
     }
 
     @Test

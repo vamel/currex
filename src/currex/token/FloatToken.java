@@ -2,14 +2,15 @@ package currex.token;
 
 public class FloatToken extends Token {
 
-    private final double value;
+    private final Double value;
 
-    public FloatToken(Position position, double value) {
+    public FloatToken(Position position, Double value) {
         super(position, TokenType.FLOAT_VALUE);
         this.value = value;
     }
 
-    public double getValue() {
+    @Override
+    public Double getValue() {
         return value;
     }
 

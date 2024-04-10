@@ -9,7 +9,8 @@ public class IntegerToken extends Token {
         this.value = value;
     }
 
-    public int getValue() {
+    @Override
+    public Integer getValue() {
         return value;
     }
 

@@ -9,6 +9,7 @@ public class StringToken extends Token {
         this.value = value;
     }
 
+    @Override
     public String getValue() {
         return value;
     }

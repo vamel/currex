@@ -12,7 +12,8 @@ public class CurrencyToken extends Token {
         this.currencyType = currencyType;
     }
 
-    public double getValue() {
+    @Override
+    public Double getValue() {
         return this.value.doubleValue();
     }
 

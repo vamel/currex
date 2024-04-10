@@ -129,7 +129,6 @@ public class Lexer {
             BigDecimal toRound = new BigDecimal(Double.toString(totalValue));
             totalValue = toRound.setScale(10, RoundingMode.HALF_UP).doubleValue();
             token = new FloatToken(tokenPosition, totalValue);
-            System.out.println(token);
         } else {
             token = new IntegerToken(tokenPosition, integerValue);
         }
@@ -206,16 +205,17 @@ public class Lexer {
         StringBuilder comment = new StringBuilder();
         comment.append(currentChar);
         nextCharacter();
+        comment.append(currentChar);
 
         if (currentChar == '/') {
-            while (currentChar != '\n' && currentChar != '\r') {
-                comment.append(currentChar);
+            while (currentChar != '\n' && currentChar != '\r' && source.Peek() != (char)-1) {
                 nextCharacter();
+                comment.append(currentChar);
             }
                 token = new StringToken(tokenPosition, comment.toString(), TokenType.COMMENT);
-            } else {
+        } else {
                 token = new Token(tokenPosition, TokenType.SLASH);
-            }
+        }
         return true;
     }
 
