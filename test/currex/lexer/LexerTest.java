@@ -1,5 +1,6 @@
 package currex.lexer;
 
+import currex.lexer.error.*;
 import currex.source.Source;
 import currex.token.Token;
 import currex.token.TokenType;
@@ -7,12 +8,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.StringReader;
 
 public class LexerTest {
     @Test
-    public void createLexerTest() throws IOException {
+    public void createLexerTest() throws Exception {
         Source reader = new Source(new FileReader("resources/lexer/string_declaration.txt"));
         Lexer lexer = new Lexer(reader);
         Token token = lexer.fetchToken();
@@ -20,7 +20,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readCommentTokensTest() throws IOException {
+    public void readCommentTokensTest() throws Exception {
         Source reader = new Source(new FileReader("resources/lexer/comment.txt"));
         Lexer lexer = new Lexer(reader);
 
@@ -30,7 +30,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readLeftBracketTest() throws IOException {
+    public void readLeftBracketTest() throws Exception {
         Source reader = new Source(new StringReader("["));
         Lexer lexer = new Lexer(reader);
 
@@ -39,7 +39,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readRightBracketTest() throws IOException {
+    public void readRightBracketTest() throws Exception {
         Source reader = new Source(new StringReader("]"));
         Lexer lexer = new Lexer(reader);
 
@@ -48,7 +48,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readLeftCurlyBracketTest() throws IOException {
+    public void readLeftCurlyBracketTest() throws Exception {
         Source reader = new Source(new StringReader("{"));
         Lexer lexer = new Lexer(reader);
 
@@ -57,7 +57,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readRightCurlyBracketTest() throws IOException {
+    public void readRightCurlyBracketTest() throws Exception {
         Source reader = new Source(new StringReader("}"));
         Lexer lexer = new Lexer(reader);
 
@@ -66,7 +66,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readLeftParenthesisTest() throws IOException {
+    public void readLeftParenthesisTest() throws Exception {
         Source reader = new Source(new StringReader("("));
         Lexer lexer = new Lexer(reader);
 
@@ -75,7 +75,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readRightParenthesisTest() throws IOException {
+    public void readRightParenthesisTest() throws Exception {
         Source reader = new Source(new StringReader(")"));
         Lexer lexer = new Lexer(reader);
 
@@ -84,7 +84,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readDotTest() throws IOException {
+    public void readDotTest() throws Exception {
         Source reader = new Source(new StringReader("."));
         Lexer lexer = new Lexer(reader);
 
@@ -93,7 +93,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readCommaTest() throws IOException {
+    public void readCommaTest() throws Exception {
         Source reader = new Source(new StringReader(","));
         Lexer lexer = new Lexer(reader);
 
@@ -102,7 +102,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readSemicolonTest() throws IOException {
+    public void readSemicolonTest() throws Exception {
         Source reader = new Source(new StringReader(";"));
         Lexer lexer = new Lexer(reader);
 
@@ -111,7 +111,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readLesserTest() throws IOException {
+    public void readLesserTest() throws Exception {
         Source reader = new Source(new StringReader("<"));
         Lexer lexer = new Lexer(reader);
 
@@ -120,7 +120,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readGreaterTest() throws IOException {
+    public void readGreaterTest() throws Exception {
         Source reader = new Source(new StringReader(">"));
         Lexer lexer = new Lexer(reader);
 
@@ -129,7 +129,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readExclamationTest() throws IOException {
+    public void readExclamationTest() throws Exception {
         Source reader = new Source(new StringReader("!"));
         Lexer lexer = new Lexer(reader);
 
@@ -138,7 +138,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readEqualsTest() throws IOException {
+    public void readEqualsTest() throws Exception {
         Source reader = new Source(new StringReader("="));
         Lexer lexer = new Lexer(reader);
 
@@ -147,7 +147,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readAtTest() throws IOException {
+    public void readAtTest() throws Exception {
         Source reader = new Source(new StringReader("@"));
         Lexer lexer = new Lexer(reader);
 
@@ -156,7 +156,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readPlusTest() throws IOException {
+    public void readPlusTest() throws Exception {
         Source reader = new Source(new StringReader("+"));
         Lexer lexer = new Lexer(reader);
 
@@ -165,7 +165,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readMinusTest() throws IOException {
+    public void readMinusTest() throws Exception {
         Source reader = new Source(new StringReader("-"));
         Lexer lexer = new Lexer(reader);
 
@@ -174,7 +174,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readAsteriskTest() throws IOException {
+    public void readAsteriskTest() throws Exception {
         Source reader = new Source(new StringReader("*"));
         Lexer lexer = new Lexer(reader);
 
@@ -183,7 +183,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readSlashTest() throws IOException {
+    public void readSlashTest() throws Exception {
         Source reader = new Source(new StringReader("/"));
         Lexer lexer = new Lexer(reader);
 
@@ -192,7 +192,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readLesserOrEqualTest() throws IOException {
+    public void readLesserOrEqualTest() throws Exception {
         Source reader = new Source(new StringReader("<="));
         Lexer lexer = new Lexer(reader);
 
@@ -201,7 +201,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readGreaterOrEqualTest() throws IOException {
+    public void readGreaterOrEqualTest() throws Exception {
         Source reader = new Source(new StringReader(">="));
         Lexer lexer = new Lexer(reader);
 
@@ -210,7 +210,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readInequalityTest() throws IOException {
+    public void readInequalityTest() throws Exception {
         Source reader = new Source(new StringReader("!="));
         Lexer lexer = new Lexer(reader);
 
@@ -219,7 +219,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readEqualityTest() throws IOException {
+    public void readEqualityTest() throws Exception {
         Source reader = new Source(new StringReader("=="));
         Lexer lexer = new Lexer(reader);
 
@@ -228,7 +228,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readAndTest() throws IOException {
+    public void readAndTest() throws Exception {
         Source reader = new Source(new StringReader("&&"));
         Lexer lexer = new Lexer(reader);
 
@@ -237,7 +237,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readOrTest() throws IOException {
+    public void readOrTest() throws Exception {
         Source reader = new Source(new StringReader("||"));
         Lexer lexer = new Lexer(reader);
 
@@ -246,7 +246,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readArrowTest() throws IOException {
+    public void readArrowTest() throws Exception {
         Source reader = new Source(new StringReader("->"));
         Lexer lexer = new Lexer(reader);
 
@@ -255,7 +255,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readWhileTest() throws IOException {
+    public void readWhileTest() throws Exception {
         Source reader = new Source(new StringReader("while"));
         Lexer lexer = new Lexer(reader);
 
@@ -264,7 +264,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readIfTest() throws IOException {
+    public void readIfTest() throws Exception {
         Source reader = new Source(new StringReader("if"));
         Lexer lexer = new Lexer(reader);
 
@@ -273,7 +273,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readElseTest() throws IOException {
+    public void readElseTest() throws Exception {
         Source reader = new Source(new StringReader("else"));
         Lexer lexer = new Lexer(reader);
 
@@ -282,7 +282,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readReturnTest() throws IOException {
+    public void readReturnTest() throws Exception {
         Source reader = new Source(new StringReader("return"));
         Lexer lexer = new Lexer(reader);
 
@@ -291,7 +291,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readIntTest() throws IOException {
+    public void readIntTest() throws Exception {
         Source reader = new Source(new StringReader("int"));
         Lexer lexer = new Lexer(reader);
 
@@ -300,7 +300,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readFloatTest() throws IOException {
+    public void readFloatTest() throws Exception {
         Source reader = new Source(new StringReader("float"));
         Lexer lexer = new Lexer(reader);
 
@@ -309,7 +309,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readCurrencyTest() throws IOException {
+    public void readCurrencyTest() throws Exception {
         Source reader = new Source(new StringReader("currency"));
         Lexer lexer = new Lexer(reader);
 
@@ -318,7 +318,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readBoolTest() throws IOException {
+    public void readBoolTest() throws Exception {
         Source reader = new Source(new StringReader("bool"));
         Lexer lexer = new Lexer(reader);
 
@@ -327,7 +327,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readStringTest() throws IOException {
+    public void readStringTest() throws Exception {
         Source reader = new Source(new StringReader("string"));
         Lexer lexer = new Lexer(reader);
 
@@ -336,7 +336,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readTrueTest() throws IOException {
+    public void readTrueTest() throws Exception {
         Source reader = new Source(new StringReader("true"));
         Lexer lexer = new Lexer(reader);
 
@@ -345,7 +345,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readFalseTest() throws IOException {
+    public void readFalseTest() throws Exception {
         Source reader = new Source(new StringReader("false"));
         Lexer lexer = new Lexer(reader);
 
@@ -354,7 +354,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readIntValueTest() throws IOException {
+    public void readIntValueTest() throws Exception {
         Source reader = new Source(new StringReader("578"));
         Lexer lexer = new Lexer(reader);
 
@@ -364,7 +364,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readIntValueMoreThanOneInitialZeroTest() throws IOException {
+    public void readIntValueMoreThanOneInitialZeroTest() throws Exception {
         Source reader = new Source(new StringReader("000000578"));
         Lexer lexer = new Lexer(reader);
 
@@ -375,7 +375,7 @@ public class LexerTest {
 
 
     @Test
-    public void readFloatValueTest() throws IOException {
+    public void readFloatValueTest() throws Exception {
         Source reader = new Source(new StringReader("5.08"));
         Lexer lexer = new Lexer(reader);
 
@@ -385,7 +385,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readFloatValueInitialZeroTest() throws IOException {
+    public void readFloatValueInitialZeroTest() throws Exception {
         Source reader = new Source(new StringReader("0.08"));
         Lexer lexer = new Lexer(reader);
 
@@ -395,7 +395,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readFloatValueMoreThanOneInitialZeroTest() throws IOException {
+    public void readFloatValueMoreThanOneInitialZeroTest() throws Exception {
         Source reader = new Source(new StringReader("000.08"));
         Lexer lexer = new Lexer(reader);
 
@@ -405,7 +405,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readStringValueTest() throws IOException {
+    public void readStringValueTest() throws Exception {
         Source reader = new Source(new StringReader("\"Long String\""));
         Lexer lexer = new Lexer(reader);
 
@@ -415,7 +415,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readSplitIdentifierTest() throws IOException {
+    public void readSplitIdentifierTest() throws Exception {
         Source reader = new Source(new StringReader("iden-tifier"));
         Lexer lexer = new Lexer(reader);
 
@@ -432,16 +432,16 @@ public class LexerTest {
     }
 
     @Test
-    public void readEmptyFileTest() throws IOException {
+    public void readEmptyFileTest() throws Exception {
         Source reader = new Source(new FileReader("resources/lexer/empty_file.txt"));
         Lexer lexer = new Lexer(reader);
 
-        Token tokenUnknown = lexer.fetchToken();
-        Assert.assertEquals(TokenType.UNKNOWN, tokenUnknown.getTokenType());
+        UnknownTokenError e = Assert.assertThrows(UnknownTokenError.class, lexer::fetchToken);
+        Assert.assertTrue(e.getMessage().contains("UNKNOWN TOKEN FOUND!"));
     }
 
     @Test
-    public void readStringTokensTest() throws IOException {
+    public void readStringTokensTest() throws Exception {
         Source reader = new Source(new FileReader("resources/lexer/string_declaration.txt"));
         Lexer lexer = new Lexer(reader);
 
@@ -471,7 +471,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readBoolTokensTest() throws IOException {
+    public void readBoolTokensTest() throws Exception {
         Source reader = new Source(new FileReader("resources/lexer/bool_declaration.txt"));
         Lexer lexer = new Lexer(reader);
 
@@ -509,7 +509,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readIntegerTokensTest() throws IOException {
+    public void readIntegerTokensTest() throws Exception {
         Source reader = new Source(new FileReader("resources/lexer/integer_declaration.txt"));
         Lexer lexer = new Lexer(reader);
 
@@ -540,7 +540,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readFloatTokensTest() throws IOException {
+    public void readFloatTokensTest() throws Exception {
         Source reader = new Source(new FileReader("resources/lexer/float_declaration.txt"));
         Lexer lexer = new Lexer(reader);
 
@@ -563,7 +563,7 @@ public class LexerTest {
     }
 
     @Test
-    public void readCurrencyTokensTest() throws IOException {
+    public void readCurrencyTokensTest() throws Exception {
         Source reader = new Source(new FileReader("resources/lexer/currency_declaration.txt"));
         Lexer lexer = new Lexer(reader);
 
@@ -611,60 +611,60 @@ public class LexerTest {
     }
 
     @Test
-    public void tooLongStringValueTest() throws IOException {
+    public void tooLongStringValueTest() throws Exception {
         Source reader = new Source(new StringReader("\"Lorem ipsum dolor sit amet, " +
                 "consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. " +
                 "Sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec qu\""));
         Lexer lexer = new Lexer(reader);
 
-        Token token = lexer.fetchToken();
-        Assert.assertEquals(TokenType.TOO_LONG_STRING_ERROR, token.getTokenType());
+        StringTooLongError e = Assert.assertThrows(StringTooLongError.class, lexer::fetchToken);
+        Assert.assertTrue(e.getMessage().contains("TOO LONG STRING!"));
     }
 
     @Test
-    public void tooLongIdentifierTest() throws IOException {
+    public void tooLongIdentifierTest() throws Exception {
         Source reader = new Source(new StringReader("elementumelementumelementumelementumelementumelementumelementum" +
                 "elementumelementumelementumelementumelementumelementumelementumelementumelementumelementumelementum"));
         Lexer lexer = new Lexer(reader);
 
-        Token token = lexer.fetchToken();
-        Assert.assertEquals(TokenType.TOO_LONG_IDENTIFIER_ERROR, token.getTokenType());
+        IdentifierTooLongError e = Assert.assertThrows(IdentifierTooLongError.class, lexer::fetchToken);
+        Assert.assertTrue(e.getMessage().contains("TOO LONG IDENTIFIER"));
     }
 
     @Test
-    public void floatingPointErrorTest() throws IOException {
+    public void floatingPointErrorTest() throws Exception {
         Source reader = new Source(new StringReader("0.111111111111111111"));
         Lexer lexer = new Lexer(reader);
 
-        Token token = lexer.fetchToken();
-        Assert.assertEquals(TokenType.FLOATING_POINT_ERROR, token.getTokenType());
+        FloatingPointError e = Assert.assertThrows(FloatingPointError.class, lexer::fetchToken);
+        Assert.assertTrue(e.getMessage().contains("FLOAT NUMBER IS TOO BIG!"));
     }
 
     @Test
-    public void tooBigIntErrorTest() throws IOException {
+    public void tooBigIntErrorTest() throws Exception {
         Source reader = new Source(new StringReader("111111111111111111"));
         Lexer lexer = new Lexer(reader);
 
-        Token token = lexer.fetchToken();
-        Assert.assertEquals(TokenType.TOO_BIG_INTEGER_ERROR, token.getTokenType());
+        TooBigIntegerError e = Assert.assertThrows(TooBigIntegerError.class, lexer::fetchToken);
+        Assert.assertTrue(e.getMessage().contains("INTEGER IS TOO BIG!"));
     }
 
     @Test
-    public void missingSecondPipeCharTest() throws IOException {
+    public void missingSecondPipeCharTest() throws Exception {
         Source reader = new Source(new StringReader("|"));
         Lexer lexer = new Lexer(reader);
 
-        Token token = lexer.fetchToken();
-        Assert.assertEquals(TokenType.MISSING_SECOND_CHARACTER_ERROR, token.getTokenType());
+        MissingSecondCharacterError e = Assert.assertThrows(MissingSecondCharacterError.class, lexer::fetchToken);
+        Assert.assertTrue(e.getMessage().contains("MISSING SECOND CHARACTER ERROR!"));
     }
 
     @Test
-    public void missingSecondAmpersandCharTest() throws IOException {
+    public void missingSecondAmpersandCharTest() throws Exception {
         Source reader = new Source(new StringReader("&"));
         Lexer lexer = new Lexer(reader);
 
-        Token token = lexer.fetchToken();
-        Assert.assertEquals(TokenType.MISSING_SECOND_CHARACTER_ERROR, token.getTokenType());
+        MissingSecondCharacterError e = Assert.assertThrows(MissingSecondCharacterError.class, lexer::fetchToken);
+        Assert.assertTrue(e.getMessage().contains("MISSING SECOND CHARACTER ERROR!"));
     }
 }
 

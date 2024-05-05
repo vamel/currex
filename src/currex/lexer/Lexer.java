@@ -23,7 +23,7 @@ public class Lexer {
         this.errorHandler = new ErrorHandler();
     }
 
-    public Token fetchToken() {
+    public Token fetchToken() throws Exception {
         if (currentChar == null) {
             nextCharacter();
         }
@@ -45,7 +45,7 @@ public class Lexer {
         return new ErrorToken(new Position(source.getPosition()), TokenType.UNKNOWN);
     }
 
-    private boolean tryBuildOperator() {
+    private boolean tryBuildOperator() throws Exception {
         if (!LexerMapping.singleCharacterOperatorsMap.containsKey(currentChar)
                 && currentChar != '&' && currentChar != '|') {
             return false;
@@ -65,7 +65,7 @@ public class Lexer {
         if (possibleFirstSigns.contains(firstSign) && possibleLastSigns.contains(nextSign)) {
             return buildDoubleSignedOperator(firstSign, nextSign, tokenPosition);
         } else if ((firstSign == '&' || firstSign == '|') && firstSign != nextSign) {
-            errorHandler.handleLexerError(new MissingSecondCharacterError("MISSING SECOND CHARACTER ERROR"),
+            errorHandler.handleLexerError(new MissingSecondCharacterError("MISSING SECOND CHARACTER ERROR!"),
                     new Position(source.getPosition()));
             token = new ErrorToken(tokenPosition, TokenType.MISSING_SECOND_CHARACTER_ERROR);
             return true;
@@ -92,7 +92,7 @@ public class Lexer {
         return true;
     }
 
-    private boolean tryBuildNumber() {
+    private boolean tryBuildNumber() throws Exception {
         if (!Character.isDigit(currentChar)) {
             return false;
         }
@@ -140,7 +140,7 @@ public class Lexer {
         return true;
     }
 
-    private boolean tryBuildIdentifier() {
+    private boolean tryBuildIdentifier() throws Exception {
         if (!Character.isLetter(currentChar) && currentChar != '_') {
             return false;
         }
@@ -171,7 +171,7 @@ public class Lexer {
         return true;
     }
 
-    private boolean tryBuildString() {
+    private boolean tryBuildString() throws Exception {
         if (currentChar != '\"') {
             return false;
         }
