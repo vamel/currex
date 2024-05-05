@@ -1,0 +1,64 @@
+package currex.token;
+
+public enum TokenType {
+    LEFT_BRACKET,
+    RIGHT_BRACKET,
+    LEFT_CURLY_BRACKET,
+    RIGHT_CURLY_BRACKET,
+    LEFT_PARENTHESIS,
+    RIGHT_PARENTHESIS,
+
+    DOT,
+    COMMA,
+    SEMICOLON,
+
+    LESSER,
+    GREATER,
+    LESSER_OR_EQUAL,
+    GREATER_OR_EQUAL,
+    INEQUALITY,
+    EQUALITY,
+
+    TRUE,
+    FALSE,
+
+    EXCLAMATION,
+    AND,
+    OR,
+
+    EQUALS,
+    AT,
+    ARROW,
+    PLUS,
+    MINUS,
+    ASTERISK,
+    SLASH,
+
+    WHILE,
+    IF,
+    ELSE,
+    RETURN,
+
+    INTEGER,
+    FLOAT,
+    STRING,
+    BOOL,
+    CURRENCY,
+
+    INTEGER_VALUE,
+    FLOAT_VALUE,
+    STRING_VALUE,
+    CURRENCY_VALUE,
+
+    IDENTIFIER,
+
+    COMMENT,
+
+    UNKNOWN,
+    TOO_LONG_STRING_ERROR,
+    TOO_LONG_IDENTIFIER_ERROR,
+    TOO_BIG_INTEGER_ERROR,
+    FLOATING_POINT_ERROR,
+    MISSING_SECOND_CHARACTER_ERROR
+
+}

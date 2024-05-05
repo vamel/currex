@@ -1,0 +1,1 @@
+currency result = some_function(5.00 EUR, 7.50 EUR);
