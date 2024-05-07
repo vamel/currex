@@ -14,13 +14,13 @@ public class Lexer {
     private final Source source;
     private Character currentChar;
     private Token token;
-    private ErrorHandler errorHandler;
+    private LexerErrorHandler errorHandler;
 
     public Lexer(Source source) {
         this.source = source;
         this.currentChar = null;
         this.token = null;
-        this.errorHandler = new ErrorHandler();
+        this.errorHandler = new LexerErrorHandler();
     }
 
     public Token fetchToken() throws Exception {
@@ -40,6 +40,9 @@ public class Lexer {
             return token;
         }
         nextCharacter();
+        if (source.isStreamEnd()) {
+            return new Token(new Position(source.getPosition()), TokenType.EOF);
+        }
         errorHandler.handleLexerError(new UnknownTokenError("UNKNOWN TOKEN FOUND!"),
                 new Position(source.getPosition()));
         return new ErrorToken(new Position(source.getPosition()), TokenType.UNKNOWN);

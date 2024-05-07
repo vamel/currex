@@ -1,17 +1,21 @@
 package currex;
 
 import currex.lexer.Lexer;
+import currex.parser.Parser;
 import currex.source.Source;
 
 import java.io.FileReader;
+import java.io.Reader;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
             String filename = args[0];
-            Source reader = new Source(new FileReader(filename));
-            Lexer lexer = new Lexer(reader);
+            Reader reader = new FileReader(filename);
+            Source source = new Source(reader);
+            Lexer lexer = new Lexer(source);
+            Parser parser = new Parser(lexer);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
