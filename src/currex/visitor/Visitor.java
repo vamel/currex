@@ -9,10 +9,10 @@ import currex.structure.primitives.*;
 import currex.structure.statements.*;
 
 public interface Visitor {
-    void visit(Parameter parameter);
+    void visit(Program program);
     void visit(Block block);
     void visit(FunctionDefinition functionDefinition);
-    void visit(Program program);
+    void visit(Parameter parameter);
 
     void visit(DeclarationStatement declarationStatement);
     void visit(AssignmentStatement assignmentStatement);
@@ -40,7 +40,6 @@ public interface Visitor {
     void visit(FunctionCallExpression functionCallExpression);
     void visit(IdentifierExpression identifierExpression);
 
-    void visit(BasicExpression simpleExpression);
     void visit(IntPrimitive intPrimitive);
     void visit(FloatPrimitive floatPrimitive);
     void visit(StringPrimitive stringPrimitive);

@@ -20,7 +20,7 @@ import java.util.Map;
 public class Parser {
     private final Lexer lexer;
     private Token currentToken;
-    private ParserErrorHandler errorHandler;
+    private final ParserErrorHandler errorHandler;
 
     public Parser(final Lexer lexer) throws Exception {
         this.lexer = lexer;
@@ -64,12 +64,12 @@ public class Parser {
         }
         consumeToken();
         if (!consumeIf(TokenType.LEFT_PARENTHESIS)) {
-            errorHandler.handleParserError(new MissingSemicolonError("MISSING OPENING PARENTHESIS!"),
+            errorHandler.handleParserError(new MissingParenthesisError("MISSING OPENING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
         List<Parameter> functionParameters = parseParameterList();
         if (!consumeIf(TokenType.RIGHT_PARENTHESIS)) {
-            errorHandler.handleParserError(new MissingSemicolonError("MISSING CLOSING PARENTHESIS!"),
+            errorHandler.handleParserError(new MissingParenthesisError("MISSING CLOSING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
         Block block = parseBlock();
@@ -138,9 +138,13 @@ public class Parser {
         return new Block(statements);
     }
 
-    // instrukcja = (przypisanie | return), ";" | wyrażenie_if | wyrażenie_while;
+    // instrukcja = (deklaracja | przypisanie | return), ";" | wyrażenie_if | wyrażenie_while;
     private Statement parseStatement() throws Exception {
-        Statement statement = parseAssignment();
+        Statement statement = parseDeclaration();
+        if (statement != null) {
+            return statement;
+        }
+        statement = parseAssignment();
         if (statement != null) {
             return statement;
         }
@@ -154,6 +158,36 @@ public class Parser {
         }
         statement = parseReturn();
         return statement;
+    }
+
+    // deklaracja = typ, identyfikator, [operator_przypisania, wyrażenie];
+    private DeclarationStatement parseDeclaration() throws Exception {
+        PrimitiveType type = checkPrimitiveType(currentToken.getTokenType());
+        if (type == PrimitiveType.NONE) {
+            return null;
+        }
+        consumeToken();
+        if (!checkTokenType(TokenType.IDENTIFIER)) {
+            errorHandler.handleParserError(new InvalidIdentifierError("INVALID PARAMETER NAME!"),
+                    new Position(currentToken.getPosition()));
+        }
+        String variableName = (String) currentToken.getValue();
+        consumeToken();
+        if (!consumeIf(TokenType.EQUALS)) {
+            errorHandler.handleParserError(new InvalidIdentifierError("INVALID ASSIGNMENT OPERATOR!"),
+                    new Position(currentToken.getPosition()));
+        }
+        Expression expression = parseExpression();
+        if (expression == null) {
+            errorHandler.handleParserError(new InvalidIdentifierError("INVALID VARIABLE DECLARATION!"),
+                    new Position(currentToken.getPosition()));
+        }
+        DeclarationStatement declaration = new DeclarationStatement(type, variableName, expression);
+        if (!consumeIf(TokenType.SEMICOLON)) {
+            errorHandler.handleParserError(new MissingSemicolonError("MISSING SEMICOLON AT THE END OF THE LINE!"),
+                    new Position(currentToken.getPosition()));
+        }
+        return declaration;
     }
 
     // przypisanie = wyrażenie_dostępu, [operator_przypisu, wyrażenie];
@@ -184,15 +218,19 @@ public class Parser {
             return null;
         }
         if (!consumeIf(TokenType.LEFT_PARENTHESIS)) {
-            errorHandler.handleParserError(new MissingSemicolonError("MISSING OPENING PARENTHESIS!"),
+            errorHandler.handleParserError(new MissingParenthesisError("MISSING OPENING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
         Expression expression = parseExpression();
         if (!consumeIf(TokenType.RIGHT_PARENTHESIS)) {
-            errorHandler.handleParserError(new MissingSemicolonError("MISSING CLOSING PARENTHESIS!"),
+            errorHandler.handleParserError(new MissingParenthesisError("MISSING CLOSING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
         Block block = parseBlock();
+        if (block.statementList().isEmpty()) {
+            errorHandler.handleParserError(new EmptyWhileBlockError("EMPTY WHILE BLOCK!"),
+                    new Position(currentToken.getPosition()));
+        }
         return new WhileStatement(expression, block);
     }
 
@@ -204,12 +242,12 @@ public class Parser {
             return null;
         }
         if (!consumeIf(TokenType.LEFT_PARENTHESIS)) {
-            errorHandler.handleParserError(new MissingSemicolonError("MISSING OPENING PARENTHESIS!"),
+            errorHandler.handleParserError(new MissingParenthesisError("MISSING OPENING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
         Expression expression = parseExpression();
         if (!consumeIf(TokenType.RIGHT_PARENTHESIS)) {
-            errorHandler.handleParserError(new MissingSemicolonError("MISSING CLOSING PARENTHESIS!"),
+            errorHandler.handleParserError(new MissingParenthesisError("MISSING CLOSING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
         Block trueBlock = parseBlock();
@@ -236,12 +274,12 @@ public class Parser {
             return null;
         }
         if (!consumeIf(TokenType.LEFT_PARENTHESIS)) {
-            errorHandler.handleParserError(new MissingSemicolonError("MISSING OPENING PARENTHESIS!"),
+            errorHandler.handleParserError(new MissingParenthesisError("MISSING OPENING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
         Expression expression = parseExpression();
         if (!consumeIf(TokenType.RIGHT_PARENTHESIS)) {
-            errorHandler.handleParserError(new MissingSemicolonError("MISSING CLOSING PARENTHESIS!"),
+            errorHandler.handleParserError(new MissingParenthesisError("MISSING CLOSING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
         return expression;
@@ -426,7 +464,7 @@ public class Parser {
                     new Position(currentToken.getPosition()));
         }
         if (!consumeIf(TokenType.RIGHT_PARENTHESIS)) {
-            errorHandler.handleParserError(new MissingSemicolonError("MISSING CLOSING PARENTHESIS!"),
+            errorHandler.handleParserError(new MissingParenthesisError("MISSING CLOSING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
         return expression;
@@ -453,20 +491,19 @@ public class Parser {
         }
         List<Expression> arguments = new ArrayList<>();
         Expression arg = parseExpression();
-        if (arg == null) {
-            return arguments;
-        }
-        arguments.add(arg);
-        while (consumeIf(TokenType.COMMA)) {
-            arg = parseExpression();
-            if (arg == null) {
-                errorHandler.handleParserError(new InvalidArgumentError("INVALID OR MISSING ARGUMENT!"),
-                        new Position(currentToken.getPosition()));
-            }
+        if (arg != null) {
             arguments.add(arg);
+            while (consumeIf(TokenType.COMMA)) {
+                arg = parseExpression();
+                if (arg == null) {
+                    errorHandler.handleParserError(new InvalidArgumentError("INVALID OR MISSING ARGUMENT!"),
+                            new Position(currentToken.getPosition()));
+                }
+                arguments.add(arg);
+            }
         }
         if (!consumeIf(TokenType.RIGHT_PARENTHESIS)) {
-            errorHandler.handleParserError(new MissingSemicolonError("MISSING CLOSING PARENTHESIS!"),
+            errorHandler.handleParserError(new MissingParenthesisError("MISSING CLOSING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
         return arguments;
