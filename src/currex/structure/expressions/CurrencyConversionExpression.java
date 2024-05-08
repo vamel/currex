@@ -2,7 +2,7 @@ package currex.structure.expressions;
 
 import currex.visitor.Visitor;
 
-public record CurrencyConversionExpression() implements Expression {
+public record CurrencyConversionExpression(Expression left, Expression right) implements Expression {
 
     @Override
     public void accept(Visitor visitor) {

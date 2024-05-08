@@ -19,8 +19,8 @@ public interface Visitor {
     void visit(ReturnStatement returnStatement);
     void visit(WhileStatement whileStatement);
     void visit(IfStatement ifStatement);
+    void visit(ElseStatement elseStatement);
 
-    void visit(FunctionCallExpression functionCallExpression);
     void visit(OrExpression orExpression);
     void visit(AndExpression andExpression);
     void visit(GreaterExpression greaterExpression);
@@ -37,6 +37,8 @@ public interface Visitor {
     void visit(CurrencyConversionExpression currencyConversionExpression);
     void visit(NegationExpression negationExpression);
     void visit(AccessExpression accessExpression);
+    void visit(FunctionCallExpression functionCallExpression);
+    void visit(IdentifierExpression identifierExpression);
 
     void visit(BasicExpression simpleExpression);
     void visit(IntPrimitive intPrimitive);
