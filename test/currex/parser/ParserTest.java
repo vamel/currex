@@ -1072,8 +1072,8 @@ public class ParserTest {
         Statement statement = program.functionDefinitions().get("functionDef").block().statementList().get(0);
         Assert.assertEquals(IfStatement.class, statement.getClass());
         IfStatement ifStatement = (IfStatement) statement;
-        Assert.assertEquals(1, ifStatement.elseStatements().size());
-        Statement elseStatement = ifStatement.elseStatements().get(0);
+        Assert.assertEquals(2, ifStatement.conditionalStatements().size());
+        Statement elseStatement = ifStatement.conditionalStatements().get(0);
         Assert.assertEquals(ElseStatement.class, elseStatement.getClass());
     }
 
@@ -1123,10 +1123,10 @@ public class ParserTest {
         Statement statement = program.functionDefinitions().get("functionDef").block().statementList().get(0);
         Assert.assertEquals(IfStatement.class, statement.getClass());
         IfStatement ifStatement = (IfStatement) statement;
-        Assert.assertEquals(2, ifStatement.elseStatements().size());
-        Statement elseStatement1 = ifStatement.elseStatements().get(0);
+        Assert.assertEquals(3, ifStatement.conditionalStatements().size());
+        Statement elseStatement1 = ifStatement.conditionalStatements().get(0);
         Assert.assertEquals(ElseStatement.class, elseStatement1.getClass());
-        Statement elseStatement2 = ifStatement.elseStatements().get(1);
+        Statement elseStatement2 = ifStatement.conditionalStatements().get(1);
         Assert.assertEquals(ElseStatement.class, elseStatement2.getClass());
     }
 

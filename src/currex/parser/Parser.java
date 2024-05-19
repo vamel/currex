@@ -158,6 +158,7 @@ public class Parser {
         }
         statement = parseReturn();
         return statement;
+        // jeżeli null -> wyrzuć błąd
     }
 
     // deklaracja = typ, identyfikator, [operator_przypisania, wyrażenie];
@@ -237,7 +238,7 @@ public class Parser {
     // wyrażenie_if = "if", "(", wyrażenie, ")", blok, {"else", ["if", "(", wyrażenie, ")"], blok};
     private IfStatement parseIf() throws Exception {
         IfStatement ifStatement;
-        List<ElseStatement> elseStatements = new ArrayList<>();
+        List<ElseStatement> conditionalStatements = new ArrayList<>();
         if (!consumeIf(TokenType.IF)) {
             return null;
         }
@@ -245,16 +246,18 @@ public class Parser {
             errorHandler.handleParserError(new MissingParenthesisError("MISSING OPENING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
-        Expression expression = parseExpression();
+        Expression ifCondition = parseExpression();
         if (!consumeIf(TokenType.RIGHT_PARENTHESIS)) {
             errorHandler.handleParserError(new MissingParenthesisError("MISSING CLOSING PARENTHESIS!"),
                     new Position(currentToken.getPosition()));
         }
-        Block trueBlock = parseBlock();
-        if (trueBlock.statementList().isEmpty()) {
+        Block ifBlock = parseBlock();
+        if (ifBlock.statementList().isEmpty()) {
             errorHandler.handleParserError(new EmptyIfElseBlockError("EMPTY IF BLOCK!"),
                     new Position(currentToken.getPosition()));
         }
+        ElseStatement ifStatementCondition = new ElseStatement(ifCondition, ifBlock);
+        conditionalStatements.add(ifStatementCondition);
         while (consumeIf(TokenType.ELSE)) {
             Expression elseCondition = parseElseCondition();
             Block elseBlock = parseBlock();
@@ -263,9 +266,9 @@ public class Parser {
                         new Position(currentToken.getPosition()));
             }
             ElseStatement elseStatement = new ElseStatement(elseCondition, elseBlock);
-            elseStatements.add(elseStatement);
+            conditionalStatements.add(elseStatement);
         }
-        ifStatement = new IfStatement(expression, trueBlock, elseStatements);
+        ifStatement = new IfStatement(conditionalStatements);
         return ifStatement;
     }
 
@@ -421,9 +424,16 @@ public class Parser {
 
     // wyrażenie_unarne = [operator_unarny], (wyrażenie_dostępu | literał);
     private Expression parseUnaryExpression() throws Exception {
-        if (consumeIf(TokenType.MINUS) || consumeIf(TokenType.EXCLAMATION)) {
+        if (checkTokenType(TokenType.MINUS) || checkTokenType(TokenType.EXCLAMATION)) {
+            TokenType tokenType = currentToken.getTokenType();
+            consumeToken();
             Expression expression = parseAccessExpression();
-            return new NegationExpression(expression);
+            switch (tokenType) {
+                case MINUS:
+                    return new MinusExpression(expression);
+                case EXCLAMATION:
+                    return new NegationExpression(expression);
+            }
         }
         return parseAccessExpression();
     }

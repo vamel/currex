@@ -104,9 +104,7 @@ public class PrinterVisitor implements Visitor {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<IfStatement>");
-        ifStatement.expression().accept(this);
-        ifStatement.trueBlock().accept(this);
-        for (ElseStatement elseStatement: ifStatement.elseStatements()) {
+        for (ElseStatement elseStatement: ifStatement.conditionalStatements()) {
             elseStatement.accept(this);
         }
         decreaseIdendation();
@@ -270,6 +268,15 @@ public class PrinterVisitor implements Visitor {
         System.out.println(ident.repeat(identation) +
                 "<NegationExpression>");
         negationExpression.expression().accept(this);
+        decreaseIdendation();
+    }
+
+    @Override
+    public void visit(MinusExpression minusExpression) {
+        increaseIdentation();
+        System.out.println(ident.repeat(identation) +
+                "<MinusExpression>");
+        minusExpression.expression().accept(this);
         decreaseIdendation();
     }
 

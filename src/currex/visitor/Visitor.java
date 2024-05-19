@@ -36,6 +36,7 @@ public interface Visitor {
     void visit(CurrencyCastExpression currencyCastExpression);
     void visit(CurrencyConversionExpression currencyConversionExpression);
     void visit(NegationExpression negationExpression);
+    void visit(MinusExpression minusExpression);
     void visit(AccessExpression accessExpression);
     void visit(FunctionCallExpression functionCallExpression);
     void visit(IdentifierExpression identifierExpression);
