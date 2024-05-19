@@ -53,6 +53,7 @@ public enum TokenType {
     IDENTIFIER,
 
     COMMENT,
+    EOF,
 
     UNKNOWN,
     TOO_LONG_STRING_ERROR,
