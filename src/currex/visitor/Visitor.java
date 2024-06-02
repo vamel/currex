@@ -31,7 +31,7 @@ public interface Visitor {
     void visit(LesserOrEqualExpression lesserOrEqualExpression);
     void visit(AdditionExpression additionExpression);
     void visit(SubtractionExpression subtractionExpression);
-    void visit(MultiplicationExpression multiplication);
+    void visit(MultiplicationExpression multiplicationExpression);
     void visit(DivisionExpression divisionExpression);
     void visit(CurrencyCastExpression currencyCastExpression);
     void visit(CurrencyConversionExpression currencyConversionExpression);

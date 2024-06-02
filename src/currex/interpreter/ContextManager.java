@@ -1,13 +1,15 @@
 package currex.interpreter;
 
-import currex.interpreter.error.VariableDoesNotExistError;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 
 public class ContextManager {
     private final Deque<Context> contexts = new ArrayDeque<>();
+
+    public Context getLastContext() {
+        return contexts.getLast();
+    }
 
     public void addContext(Context context) {
         contexts.push(context);
@@ -30,10 +32,10 @@ public class ContextManager {
                 return;
             }
         }
-        throw new VariableDoesNotExistError("VARIABLE " + name + " DOES NOT EXIST IN ANY CONTEXT");
+        System.out.println("VariableDoesNotExistError(VARIABLE " + name + " DOES NOT EXIST IN ANY CONTEXT");
     }
 
-    public Variable fetchVariable(String name) throws Exception {
+    public Variable fetchVariable(String name) {
         Iterator<Context> iterator = contexts.descendingIterator();
         while (iterator.hasNext()) {
             Context currentContext = iterator.next();
@@ -41,6 +43,7 @@ public class ContextManager {
                 return currentContext.getVariable(name);
             }
         }
-        throw new VariableDoesNotExistError("VARIABLE " + name + " DOES NOT EXIST IN ANY CONTEXT");
+        System.out.println("VariableDoesNotExistError(VARIABLE " + name + " DOES NOT EXIST IN ANY CONTEXT");
+        return null;
     }
 }
