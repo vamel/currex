@@ -1,10 +1,8 @@
 package currex.interpreter;
 
+public record LastResult(Value value) {
 
-
-public record LastResult(boolean returned, boolean present, Value value) {
-
-    public static LastResult empty() {
-        return new LastResult(false, false, null);
+    public static LastResult nullify() {
+        return new LastResult(null);
     }
 }

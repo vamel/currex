@@ -10,7 +10,7 @@ import currex.structure.statements.*;
 import currex.visitor.Visitor;
 
 public class Interpreter implements Interpretable, Visitor {
-
+    private Object lastResult = null;
 
 
     @Override

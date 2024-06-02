@@ -1,7 +1,9 @@
 package currex.interpreter;
 
+import currex.interpreter.error.InvalidVariableTypeError;
+import currex.interpreter.error.VariableAlreadyExistsError;
+
 import java.util.HashMap;
-import java.util.Optional;
 
 public class Context {
     private final HashMap<String, Variable> variables;
@@ -10,25 +12,27 @@ public class Context {
         this.variables = variables;
     }
 
-    public Optional<Variable> getVariable(String name) {
-        return Optional.ofNullable(variables.get(name));
+    public HashMap<String, Variable> getVariables() {
+        return variables;
     }
 
-    public void addVariable(String name, Variable variable) {
+    public Variable getVariable(String name) {
+        return variables.get(name);
+    }
+
+    public void addVariable(String name, Variable variable) throws Exception {
         if (variables.containsKey(name)) {
-            // HANDLE ERROR DUPLICATE KEY
-            return;
+            throw new VariableAlreadyExistsError("VARIABLE " + name + " HAS BEEN ALREADY DEFINED");
         }
         variables.put(name, variable);
     }
 
-    public boolean updateVariable(String name, Value newValue) {
+    public void updateVariable(String name, Value newValue) throws InvalidVariableTypeError {
         Variable previous = variables.get(name);
         if (previous.value().valueType() != newValue.valueType()) {
-            // HANDLE ERROR VALUES NOT THE SAME
-            return false;
+            throw new InvalidVariableTypeError("VARIABLE " + name + " WITH TYPE " + previous.value().valueType() +
+                    " CANNOT BE ASSIGNED WITH VALUE " + newValue.value() + " WITH TYPE " + newValue.valueType());
         }
         variables.put(name, new Variable(name, newValue));
-        return true;
     }
 }
