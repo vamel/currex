@@ -145,9 +145,16 @@ public class Interpreter implements Interpretable, Visitor {
             lastResult = new Value(PrimitiveType.FLOAT, (Double) left.value() + (Double) right.value());
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
-            BigDecimal currencyValue = BigDecimal.valueOf((Double) left.value() + (Double) right.value());
-            currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-            lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            if (currencyLeft.name().equals(currencyRight.name())) {
+                BigDecimal currencyValue = currencyLeft.value().add(currencyRight.value());
+                currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
+                lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+            }
+            else {
+                System.out.println("INCOMPATIBLE CURRENCY TYPES");
+            }
         }
         else {
             System.out.println("ADDITION NOT POSSIBLE");
@@ -168,9 +175,16 @@ public class Interpreter implements Interpretable, Visitor {
             lastResult = new Value(PrimitiveType.FLOAT, (Double) left.value() - (Double) right.value());
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
-            BigDecimal currencyValue = BigDecimal.valueOf((Double) left.value() - (Double) right.value());
-            currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-            lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            if (currencyLeft.name().equals(currencyRight.name())) {
+                BigDecimal currencyValue = currencyLeft.value().subtract(currencyRight.value());
+                currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
+                lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+            }
+            else {
+                System.out.println("INCOMPATIBLE CURRENCY TYPES");
+            }
         }
         else {
             System.out.println("SUBTRACTION NOT POSSIBLE");
@@ -191,9 +205,16 @@ public class Interpreter implements Interpretable, Visitor {
             lastResult = new Value(PrimitiveType.FLOAT, (Double) left.value() * (Double) right.value());
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
-            BigDecimal currencyValue = BigDecimal.valueOf((Double) left.value() * (Double) right.value());
-            currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-            lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            if (currencyLeft.name().equals(currencyRight.name())) {
+                BigDecimal currencyValue = currencyLeft.value().multiply(currencyRight.value());
+                currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
+                lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+            }
+            else {
+                System.out.println("INCOMPATIBLE CURRENCY TYPES");
+            }
         }
         else {
             System.out.println("MULTIPLICATION NOT POSSIBLE");
@@ -214,9 +235,16 @@ public class Interpreter implements Interpretable, Visitor {
             lastResult = new Value(PrimitiveType.FLOAT, (Double) left.value() / (Double) right.value());
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
-            BigDecimal currencyValue = BigDecimal.valueOf((Double) left.value() / (Double) right.value());
-            currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-            lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            if (currencyLeft.name().equals(currencyRight.name())) {
+                BigDecimal currencyValue = currencyLeft.value().divide(currencyRight.value(), RoundingMode.HALF_DOWN);
+                currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
+                lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+            }
+            else {
+                System.out.println("INCOMPATIBLE CURRENCY TYPES");
+            }
         }
         else {
             System.out.println("DIVISION NOT POSSIBLE");
@@ -235,17 +263,37 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(NegationExpression negationExpression) {
-
+        negationExpression.accept(this);
+        Value result = lastResult;
+        if (result.valueType() == PrimitiveType.BOOL) {
+            lastResult = new Value(PrimitiveType.BOOL, !(Boolean) result.value());
+        }
+        else {
+            System.out.println("NEGATION NOT POSSIBLE");
+        }
     }
 
     @Override
     public void visit(MinusExpression minusExpression) {
-
+        minusExpression.accept(this);
+        Value result = lastResult;
+        if (result.valueType() == PrimitiveType.INTEGER) {
+            lastResult = new Value(result.valueType(), -(Integer) result.value());
+        }
+        else if (result.valueType() == PrimitiveType.FLOAT) {
+            lastResult = new Value(result.valueType(), -(Double) result.value());
+        }
+        else if (result.valueType() == PrimitiveType.CURRENCY) {
+            BigDecimal value = BigDecimal.valueOf(-(Double) result.value());
+            lastResult = new Value(result.valueType(), value);
+        }
+        else {
+            System.out.println("NEGATION NOT POSSIBLE");
+        }
     }
 
     @Override
     public void visit(AccessExpression accessExpression) {
-
     }
 
     @Override
