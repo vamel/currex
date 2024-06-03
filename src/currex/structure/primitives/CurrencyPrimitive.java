@@ -4,7 +4,30 @@ import currex.visitor.Visitor;
 
 import java.math.BigDecimal;
 
-public record CurrencyPrimitive(BigDecimal value, String name) implements Primitive {
+public class CurrencyPrimitive implements Primitive {
+    private BigDecimal value;
+    private String name;
+
+    public CurrencyPrimitive(BigDecimal value, String name) {
+        this.value = value;
+        this.name = name;
+    }
+
+    public BigDecimal getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setValue(BigDecimal value) {
+        this.value = value;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     @Override
     public void accept(Visitor visitor) {

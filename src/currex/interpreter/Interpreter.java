@@ -172,10 +172,10 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
-            if (currencyLeft.name().equals(currencyRight.name())) {
-                BigDecimal currencyValue = currencyLeft.value().add(currencyRight.value());
+            if (currencyLeft.getName().equals(currencyRight.getName())) {
+                BigDecimal currencyValue = currencyLeft.getValue().add(currencyRight.getValue());
                 currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.name());
+                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.getName());
                 lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
@@ -208,10 +208,10 @@ public class Interpreter implements Interpretable, Visitor {
             System.out.println(left);
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
-            if (currencyLeft.name().equals(currencyRight.name())) {
-                BigDecimal currencyValue = currencyLeft.value().subtract(currencyRight.value());
+            if (currencyLeft.getName().equals(currencyRight.getName())) {
+                BigDecimal currencyValue = currencyLeft.getValue().subtract(currencyRight.getValue());
                 currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.name());
+                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.getName());
                 lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
@@ -243,10 +243,10 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
-            if (currencyLeft.name().equals(currencyRight.name())) {
-                BigDecimal currencyValue = currencyLeft.value().multiply(currencyRight.value());
+            if (currencyLeft.getName().equals(currencyRight.getName())) {
+                BigDecimal currencyValue = currencyLeft.getValue().multiply(currencyRight.getValue());
                 currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.name());
+                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.getName());
                 lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
@@ -284,13 +284,13 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
-            if (currencyRight.value().equals(BigDecimal.valueOf(0.0))) {
+            if (currencyRight.getValue().equals(BigDecimal.valueOf(0.0))) {
                 System.out.println("DIVISION BY ZERO NOT POSSIBLE");
             }
-            if (currencyLeft.name().equals(currencyRight.name())) {
-                BigDecimal currencyValue = currencyLeft.value().divide(currencyRight.value(), RoundingMode.HALF_DOWN);
+            if (currencyLeft.getName().equals(currencyRight.getName())) {
+                BigDecimal currencyValue = currencyLeft.getValue().divide(currencyRight.getValue(), RoundingMode.HALF_DOWN);
                 currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.name());
+                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.getName());
                 lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
