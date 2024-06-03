@@ -10,4 +10,9 @@ public record CurrencyPrimitive(BigDecimal value, String name) implements Primit
     public void accept(Visitor visitor) {
         visitor.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return value + " " + name;
+    }
 }

@@ -17,11 +17,11 @@ public class Context {
         return variables.get(name);
     }
 
-    public void addVariable(String name, Variable variable) {
-        if (variables.containsKey(name)) {
-            System.out.println("VariableAlreadyExistsError(VARIABLE  + " + name + " HAS BEEN ALREADY DEFINED");
+    public void addVariable(Variable variable) {
+        if (variables.containsKey(variable.name())) {
+            System.out.println("VariableAlreadyExistsError(VARIABLE  + " + variable.name() + " HAS BEEN ALREADY DEFINED");
         }
-        variables.put(name, variable);
+        variables.put(variable.name(), variable);
     }
 
     public void updateVariable(String name, Value newValue) {

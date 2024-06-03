@@ -19,11 +19,11 @@ public class ContextManager {
         contexts.pop();
     }
 
-    public void addVariable(String name, Variable variable) throws Exception {
-        contexts.getLast().addVariable(name, variable);
+    public void addVariable(Variable variable) {
+        contexts.getLast().addVariable(variable);
     }
 
-    public void updateVariable(String name, Value newValue) throws Exception {
+    public void updateVariable(String name, Value newValue) {
         Iterator<Context> iterator = contexts.descendingIterator();
         while (iterator.hasNext()) {
             Context currentContext = iterator.next();

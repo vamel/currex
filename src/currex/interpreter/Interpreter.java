@@ -7,11 +7,13 @@ import currex.structure.components.Program;
 import currex.structure.expressions.*;
 import currex.structure.primitives.*;
 import currex.structure.statements.*;
+import currex.utils.CurrexConfig;
 import currex.visitor.Visitor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Interpreter implements Interpretable, Visitor {
@@ -34,7 +36,9 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(Program program) {
-
+        functionDefinitions.putAll(program.functionDefinitions());
+        FunctionCallExpression main = new FunctionCallExpression(CurrexConfig.MAIN_FUNCTION_NAME, List.of());
+        main.accept(this);
     }
 
     @Override
@@ -57,12 +61,28 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(DeclarationStatement declarationStatement) {
-
+        Context currentContext = contextManager.getLastContext();
+        declarationStatement.expression().accept(this);
+        if (lastResult.valueType() != declarationStatement.type()) {
+            System.out.println("INVALID VARIABLE TYPE");
+        }
+        Variable variable = new Variable(declarationStatement.name(), new Value(
+                declarationStatement.type(), lastResult));
+        currentContext.addVariable(variable);
     }
 
     @Override
     public void visit(AssignmentStatement assignmentStatement) {
-
+        assignmentStatement.left().accept(this);
+        Value leftValue = copyLastResult();
+        assignmentStatement.right().accept(this);
+        if (lastResult != null) {
+            Value rightValue = copyLastResult();
+            if (assignmentStatement.left().getClass() == IdentifierExpression.class) {
+                String variableName = ((IdentifierExpression) assignmentStatement.left()).name();
+                contextManager.updateVariable(variableName, rightValue);
+            }
+        }
     }
 
     @Override
@@ -74,6 +94,7 @@ public class Interpreter implements Interpretable, Visitor {
         else {
             copyLastResult();
         }
+        System.out.println("RETURN:" + lastResult);
     }
 
     @Override
@@ -138,11 +159,15 @@ public class Interpreter implements Interpretable, Visitor {
         additionExpression.right().accept(this);
         Value right = lastResult;
         if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
-            lastResult = new Value(PrimitiveType.INTEGER, (Integer) left.value() + (Integer) right.value());
+            IntPrimitive leftValue = (IntPrimitive) left.value();
+            IntPrimitive rightValue = (IntPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.INTEGER, new IntPrimitive(leftValue.value() + rightValue.value()));
         }
         else if ((left.valueType() == PrimitiveType.INTEGER || left.valueType() == PrimitiveType.FLOAT) &&
                 (right.valueType() == PrimitiveType.INTEGER || right.valueType() == PrimitiveType.FLOAT)) {
-            lastResult = new Value(PrimitiveType.FLOAT, (Double) left.value() + (Double) right.value());
+            FloatPrimitive leftValue = (FloatPrimitive) left.value();
+            FloatPrimitive rightValue = (FloatPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.FLOAT, new FloatPrimitive(leftValue.value() + rightValue.value()));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
@@ -150,7 +175,8 @@ public class Interpreter implements Interpretable, Visitor {
             if (currencyLeft.name().equals(currencyRight.name())) {
                 BigDecimal currencyValue = currencyLeft.value().add(currencyRight.value());
                 currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-                lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.name());
+                lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
                 System.out.println("INCOMPATIBLE CURRENCY TYPES");
@@ -168,19 +194,25 @@ public class Interpreter implements Interpretable, Visitor {
         subtractionExpression.right().accept(this);
         Value right = lastResult;
         if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
-            lastResult = new Value(PrimitiveType.INTEGER, (Integer) left.value() - (Integer) right.value());
+            IntPrimitive leftValue = (IntPrimitive) left.value();
+            IntPrimitive rightValue = (IntPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.INTEGER, new IntPrimitive(leftValue.value() - rightValue.value()));
         }
         else if ((left.valueType() == PrimitiveType.INTEGER || left.valueType() == PrimitiveType.FLOAT) &&
                 (right.valueType() == PrimitiveType.INTEGER || right.valueType() == PrimitiveType.FLOAT)) {
-            lastResult = new Value(PrimitiveType.FLOAT, (Double) left.value() - (Double) right.value());
+            FloatPrimitive leftValue = (FloatPrimitive) left.value();
+            FloatPrimitive rightValue = (FloatPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.FLOAT, new FloatPrimitive(leftValue.value() - rightValue.value()));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
+            System.out.println(left);
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
             if (currencyLeft.name().equals(currencyRight.name())) {
                 BigDecimal currencyValue = currencyLeft.value().subtract(currencyRight.value());
                 currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-                lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.name());
+                lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
                 System.out.println("INCOMPATIBLE CURRENCY TYPES");
@@ -198,11 +230,15 @@ public class Interpreter implements Interpretable, Visitor {
         multiplicationExpression.right().accept(this);
         Value right = lastResult;
         if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
-            lastResult = new Value(PrimitiveType.INTEGER, (Integer) left.value() * (Integer) right.value());
+            IntPrimitive leftValue = (IntPrimitive) left.value();
+            IntPrimitive rightValue = (IntPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.INTEGER, new IntPrimitive(leftValue.value() * rightValue.value()));
         }
         else if ((left.valueType() == PrimitiveType.INTEGER || left.valueType() == PrimitiveType.FLOAT) &&
                 (right.valueType() == PrimitiveType.INTEGER || right.valueType() == PrimitiveType.FLOAT)) {
-            lastResult = new Value(PrimitiveType.FLOAT, (Double) left.value() * (Double) right.value());
+            FloatPrimitive leftValue = (FloatPrimitive) left.value();
+            FloatPrimitive rightValue = (FloatPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.FLOAT, new FloatPrimitive(leftValue.value() * rightValue.value()));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
@@ -210,7 +246,8 @@ public class Interpreter implements Interpretable, Visitor {
             if (currencyLeft.name().equals(currencyRight.name())) {
                 BigDecimal currencyValue = currencyLeft.value().multiply(currencyRight.value());
                 currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-                lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.name());
+                lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
                 System.out.println("INCOMPATIBLE CURRENCY TYPES");
@@ -228,19 +265,33 @@ public class Interpreter implements Interpretable, Visitor {
         divisionExpression.right().accept(this);
         Value right = lastResult;
         if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
-            lastResult = new Value(PrimitiveType.INTEGER, (Integer) left.value() / (Integer) right.value());
+            IntPrimitive leftValue = (IntPrimitive) left.value();
+            IntPrimitive rightValue = (IntPrimitive) right.value();
+            if (rightValue.value().equals(0)) {
+                System.out.println("DIVISION BY ZERO NOT POSSIBLE");
+            }
+            lastResult = new Value(PrimitiveType.INTEGER, new IntPrimitive(leftValue.value() / rightValue.value()));
         }
         else if ((left.valueType() == PrimitiveType.INTEGER || left.valueType() == PrimitiveType.FLOAT) &&
                 (right.valueType() == PrimitiveType.INTEGER || right.valueType() == PrimitiveType.FLOAT)) {
-            lastResult = new Value(PrimitiveType.FLOAT, (Double) left.value() / (Double) right.value());
+            FloatPrimitive leftValue = (FloatPrimitive) left.value();
+            FloatPrimitive rightValue = (FloatPrimitive) right.value();
+            if (rightValue.value().equals(0.0)) {
+                System.out.println("DIVISION BY ZERO NOT POSSIBLE");
+            }
+            lastResult = new Value(PrimitiveType.FLOAT, new FloatPrimitive(leftValue.value() / rightValue.value()));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            if (currencyRight.value().equals(BigDecimal.valueOf(0.0))) {
+                System.out.println("DIVISION BY ZERO NOT POSSIBLE");
+            }
             if (currencyLeft.name().equals(currencyRight.name())) {
                 BigDecimal currencyValue = currencyLeft.value().divide(currencyRight.value(), RoundingMode.HALF_DOWN);
                 currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
-                lastResult = new Value(PrimitiveType.CURRENCY, currencyValue);
+                CurrencyPrimitive primitive = new CurrencyPrimitive(currencyValue, currencyLeft.name());
+                lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
                 System.out.println("INCOMPATIBLE CURRENCY TYPES");
@@ -298,7 +349,38 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(FunctionCallExpression functionCallExpression) {
-
+        if (!functionDefinitions.containsKey(functionCallExpression.name())) {
+            System.out.println("NO FUNCTION WITH THIS NAME ERROR");
+        }
+        FunctionDefinition functionDefinition = functionDefinitions.get(functionCallExpression.name());
+        if (functionDefinition.parameters().size() != functionCallExpression.arguments().size()) {
+            System.out.println("INVALID NUMBER OF ARGUMENTS FOR FUNCTION XYZ, EXPECTED: Y BUT RECEIVED: X");
+        }
+        List<Expression> functionArguments = functionCallExpression.arguments();
+        Context functionCallContext = new Context(new HashMap<>());
+        for (int i = 0; i < functionArguments.size(); i++) {
+            functionArguments.get(i).accept(this);
+            Parameter param = functionDefinition.parameters().get(i);
+            if (lastResult.valueType() != param.type()) {
+                System.out.println("INVALID ARGUMENT TYPE");
+            }
+            else {
+                Variable variable = new Variable(param.name(), new Value(param.type(), lastResult));
+                functionCallContext.addVariable(variable);
+            }
+        }
+        contextManager.addContext(functionCallContext);
+        functionDefinition.block().accept(this);
+        if (functionDefinition.returnType() == PrimitiveType.NONE) {
+            lastResult = null;
+        }
+        else if (lastResult.valueType() != functionDefinition.returnType()) {
+            System.out.println("INVALID RETURN TYPE");
+        }
+        else {
+            System.out.println("NO RETURN VALUE SPECIFIED");
+        }
+        contextManager.removeCurrentContext();
     }
 
     @Override
