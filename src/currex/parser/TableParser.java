@@ -92,10 +92,15 @@ public class TableParser {
         List<ConversionRateExpression> rowConversionRates = new ArrayList<>();
         CurrencyIdentifierExpression identifier = parseCurrencyIdentifier();
         while (currentToken.getTokenType() == TokenType.INTEGER_VALUE ||
-                currentToken.getTokenType() == TokenType.FLOAT_VALUE) {
+                currentToken.getTokenType() == TokenType.FLOAT_VALUE ||
+                currentToken.getTokenType() == TokenType.MINUS) {
             if (rowConversionRates.size() == CurrexConfig.MAX_CONVERSION_TABLE_SIZE) {
                 errorHandler.handleParserError(new TooManyCurrenciesError("TOO MANY CURRENCIES IN A ROW, " +
                                 "EXPECTED " + CurrexConfig.MAX_CONVERSION_TABLE_SIZE + " BUT RECEIVED MORE!"),
+                        new Position(currentToken.getPosition()));
+            }
+            if (currentToken.getTokenType() == TokenType.MINUS) {
+                errorHandler.handleParserError(new NegationNotAllowedError("NEGATION IS NOT ALLOWED!"),
                         new Position(currentToken.getPosition()));
             }
             ConversionRateExpression conversionRate = parseConversionRate();
