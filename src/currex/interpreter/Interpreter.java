@@ -503,12 +503,40 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(CurrencyCastExpression currencyCastExpression) {
-
+        currencyCastExpression.left().accept(this);
+        Value left = lastResult;
+        currencyCastExpression.right().accept(this);
+        Value right = lastResult;
+        if (left.valueType() == PrimitiveType.CURRENCY) {
+            CurrencyPrimitive leftValue = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive rightValue = (CurrencyPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.CURRENCY, new CurrencyPrimitive(leftValue.getValue(), rightValue.getName()));
+        }
+        else {
+            System.out.println("CURRENCY CASTING CANNOT BE APPLIED TO NON-CURRENCY VALUES!");
+        }
     }
 
     @Override
     public void visit(CurrencyConversionExpression currencyConversionExpression) {
-
+        currencyConversionExpression.left().accept(this);
+        Value left = lastResult;
+        currencyConversionExpression.right().accept(this);
+        Value right = lastResult;
+        if (left.valueType() == PrimitiveType.CURRENCY) {
+            System.out.println(left);
+            CurrencyPrimitive leftValue = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive rightValue = (CurrencyPrimitive) right.value();
+            int conversionRateColumn = conversionTable.getColumnCurrencies().indexOf(rightValue.getName());
+            int conversionRateRow = conversionTable.getRowCurrencies().indexOf(leftValue.getName());
+            Double conversionRate = conversionTable.getConversionTable().get(conversionRateRow).get(conversionRateColumn);
+            BigDecimal currencyValue = leftValue.getValue().multiply(BigDecimal.valueOf(conversionRate));
+            currencyValue = currencyValue.setScale(10, RoundingMode.HALF_DOWN);
+            lastResult = new Value(PrimitiveType.CURRENCY, new CurrencyPrimitive(currencyValue, rightValue.getName()));
+        }
+        else {
+            System.out.println("CURRENCY CONVERSION CANNOT BE APPLIED TO NON-CURRENCY VALUES!");
+        }
     }
 
     @Override
@@ -539,7 +567,7 @@ public class Interpreter implements Interpretable, Visitor {
         else if (result.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyValue = (CurrencyPrimitive) result.value();
             BigDecimal value = currencyValue.getValue().negate();
-            lastResult = new Value(result.valueType(), value);
+            lastResult = new Value(result.valueType(), new CurrencyPrimitive(value, currencyValue.getName()));
         }
         else {
             System.out.println("NEGATION NOT POSSIBLE");
@@ -587,6 +615,11 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(IdentifierExpression identifierExpression) {
+        if (conversionTable.getColumnCurrencies().contains(identifierExpression.name())) {
+            BigDecimal temporaryValue = BigDecimal.valueOf(0.0);
+            lastResult = new Value(PrimitiveType.CURRENCY, new CurrencyPrimitive(temporaryValue, identifierExpression.name()));
+            return;
+        }
         Value value = contextManager.fetchVariable(identifierExpression.name());
         if (value == null) {
             System.out.println("VariableDoesNotExistError(VARIABLE " + identifierExpression.name() + " DOES NOT EXIST IN ANY CONTEXT");

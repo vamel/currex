@@ -11,7 +11,7 @@ import java.util.List;
 public class ConversionTable {
     private final List<String> columnCurrencies = new ArrayList<>();
     private final List<String> rowCurrencies = new ArrayList<>();
-    private final List<List<Double>> currencyTable = new ArrayList<>();
+    private final List<List<Double>> conversionTable = new ArrayList<>();
 
     public ConversionTable(TableStatement currencyTable) {
         for (CurrencyIdentifierExpression currencyName : currencyTable.currencyRow().currencyNames()) {
@@ -37,7 +37,7 @@ public class ConversionTable {
     }
 
     public void putConversionRow(List<Double> currencyRow) {
-        currencyTable.add(currencyRow);
+        conversionTable.add(currencyRow);
     }
 
     public List<String> getColumnCurrencies() {
@@ -48,7 +48,7 @@ public class ConversionTable {
         return rowCurrencies;
     }
 
-    public List<List<Double>> getCurrencyTable() {
-        return currencyTable;
+    public List<List<Double>> getConversionTable() {
+        return conversionTable;
     }
 }
