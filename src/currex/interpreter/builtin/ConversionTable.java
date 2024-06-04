@@ -1,12 +1,31 @@
 package currex.interpreter.builtin;
 
+import currex.structure.table.ConversionRateExpression;
+import currex.structure.table.ConversionRowExpression;
+import currex.structure.table.CurrencyIdentifierExpression;
+import currex.structure.table.TableStatement;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConversionTable {
-    private List<String> columnCurrencies;
-    private List<String> rowCurrencies;
-    private List<List<Double>> currencyTable = new ArrayList<>();
+    private final List<String> columnCurrencies = new ArrayList<>();
+    private final List<String> rowCurrencies = new ArrayList<>();
+    private final List<List<Double>> currencyTable = new ArrayList<>();
+
+    public ConversionTable(TableStatement currencyTable) {
+        for (CurrencyIdentifierExpression currencyName : currencyTable.currencyRow().currencyNames()) {
+            putColumnCurrency(currencyName.name());
+        }
+        for (ConversionRowExpression conversionRow : currencyTable.conversionRows()) {
+            putRowCurrency(conversionRow.currencyName().name());
+            List<Double> conversionList = new ArrayList<>();
+            for (ConversionRateExpression rate : conversionRow.currencyRates()) {
+                conversionList.add(rate.conversion());
+            }
+            putConversionRow(conversionList);
+        }
+    }
 
     public void putColumnCurrency(String currency) {
         columnCurrencies.add(currency);
