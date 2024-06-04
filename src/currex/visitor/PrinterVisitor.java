@@ -345,8 +345,8 @@ public class PrinterVisitor implements Visitor {
     public void visit(CurrencyPrimitive currencyPrimitive) {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
-                "<CurrencyPrimitive value=" + currencyPrimitive.value() +
-                " type=" + currencyPrimitive.name() + ">");
+                "<CurrencyPrimitive value=" + currencyPrimitive.getValue() +
+                " type=" + currencyPrimitive.getName() + ">");
         decreaseIdendation();
     }
 

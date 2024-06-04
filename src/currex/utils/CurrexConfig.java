@@ -5,4 +5,5 @@ public class CurrexConfig {
     public static final int MAX_ITERATIONS = 10;
     public static final int MAX_RECURSION_DEPTH = 10;
     public static final int MAX_CONTEXT_DEPTH = 10;
+    public static final int MAX_CONVERSION_TABLE_SIZE = 5;
 }
