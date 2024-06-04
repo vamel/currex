@@ -23,6 +23,7 @@ public class Interpreter implements Interpretable, Visitor {
     private final ConversionTable conversionTable;
     private Value lastResult = null;
     private boolean isReturn = false;
+    private boolean isIfStatement = false;
 
 
     public Interpreter(ConversionTable conversionTable) {
@@ -103,12 +104,34 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(IfStatement ifStatement) {
-
+        List<ElseStatement> elseStatements = ifStatement.conditionalStatements();
+        for (int i = 0; i < elseStatements.size(); i++) {
+            if (isIfStatement) {
+                isIfStatement = false;
+                break;
+            }
+            ElseStatement elseStatement = elseStatements.get(i);
+            if (elseStatement.expression() != null) {
+                elseStatement.accept(this);
+            }
+            else if (i == elseStatements.size() - 1) {
+                elseStatement.block().accept(this);
+            }
+        }
     }
 
     @Override
     public void visit(ElseStatement elseStatement) {
-
+        elseStatement.expression().accept(this);
+        Value check = lastResult;
+        if (check.valueType() != PrimitiveType.BOOL) {
+            System.out.println("Evaluated expression does not give a bool value");
+        }
+        BoolPrimitive leftBool = (BoolPrimitive) check.value();
+        if (leftBool.value()) {
+            isIfStatement = true;
+            elseStatement.block().accept(this);
+        }
     }
 
     @Override
@@ -118,16 +141,6 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(AndExpression andExpression) {
-
-    }
-
-    @Override
-    public void visit(GreaterExpression greaterExpression) {
-
-    }
-
-    @Override
-    public void visit(LesserExpression lesserExpression) {
 
     }
 
@@ -147,31 +160,148 @@ public class Interpreter implements Interpretable, Visitor {
             BoolPrimitive rightBool = (BoolPrimitive) right.value();
             lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftBool.value() == rightBool.value()));
         }
-//        else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
-//            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(left.value() == right.value()));
-//        }
-//        else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
-//            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
-//            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
-//            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
-//                    currencyLeft.getName().equals(currencyRight.getName()) &&
-//                            currencyLeft.getValue().equals(currencyRight.getValue())));
-//        }
+        else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
+            FloatPrimitive leftValue = (FloatPrimitive) left.value();
+            FloatPrimitive rightValue = (FloatPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftValue.value().equals(rightValue.value())));
+        }
+        else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
+            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+                    currencyLeft.getName().equals(currencyRight.getName()) &&
+                            currencyLeft.getValue().equals(currencyRight.getValue())));
+        }
     }
 
     @Override
     public void visit(NotEqualExpression notEqualExpression) {
+        notEqualExpression.left().accept(this);
+        Value left = lastResult;
+        notEqualExpression.right().accept(this);
+        Value right = lastResult;
+        if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
+            IntPrimitive leftValue = (IntPrimitive) left.value();
+            IntPrimitive rightValue = (IntPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, (!leftValue.value().equals(rightValue.value())));
+        }
+        else if (left.valueType() == PrimitiveType.BOOL && right.valueType() == PrimitiveType.BOOL) {
+            BoolPrimitive leftBool = (BoolPrimitive) left.value();
+            BoolPrimitive rightBool = (BoolPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(!leftBool.value() == rightBool.value()));
+        }
+        else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
+            FloatPrimitive leftValue = (FloatPrimitive) left.value();
+            FloatPrimitive rightValue = (FloatPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(!leftValue.value().equals(rightValue.value())));
+        }
+        else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
+            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+                    !currencyLeft.getName().equals(currencyRight.getName()) ||
+                            !currencyLeft.getValue().equals(currencyRight.getValue())));
+        }
+    }
 
+    @Override
+    public void visit(GreaterExpression greaterExpression) {
+        greaterExpression.left().accept(this);
+        Value left = lastResult;
+        greaterExpression.right().accept(this);
+        Value right = lastResult;
+        if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
+            IntPrimitive leftValue = (IntPrimitive) left.value();
+            IntPrimitive rightValue = (IntPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, (leftValue.value() > rightValue.value()));
+        }
+        else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
+            FloatPrimitive leftValue = (FloatPrimitive) left.value();
+            FloatPrimitive rightValue = (FloatPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftValue.value() > rightValue.value()));
+        }
+        else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
+            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            int comparison = currencyLeft.getValue().compareTo(currencyRight.getValue());
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+                    currencyLeft.getName().equals(currencyRight.getName()) && (comparison > 0)));
+        }
+    }
+
+    @Override
+    public void visit(LesserExpression lesserExpression) {
+        lesserExpression.left().accept(this);
+        Value left = lastResult;
+        lesserExpression.right().accept(this);
+        Value right = lastResult;
+        if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
+            IntPrimitive leftValue = (IntPrimitive) left.value();
+            IntPrimitive rightValue = (IntPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, (leftValue.value() < rightValue.value()));
+        }
+        else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
+            FloatPrimitive leftValue = (FloatPrimitive) left.value();
+            FloatPrimitive rightValue = (FloatPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftValue.value() < rightValue.value()));
+        }
+        else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
+            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            int comparison = currencyLeft.getValue().compareTo(currencyRight.getValue());
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+                    currencyLeft.getName().equals(currencyRight.getName()) && (comparison < 0)));
+        }
     }
 
     @Override
     public void visit(GreaterOrEqualExpression greaterOrEqualExpression) {
-
+        greaterOrEqualExpression.left().accept(this);
+        Value left = lastResult;
+        greaterOrEqualExpression.right().accept(this);
+        Value right = lastResult;
+        if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
+            IntPrimitive leftValue = (IntPrimitive) left.value();
+            IntPrimitive rightValue = (IntPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, (leftValue.value() >= rightValue.value()));
+        }
+        else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
+            FloatPrimitive leftValue = (FloatPrimitive) left.value();
+            FloatPrimitive rightValue = (FloatPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftValue.value() >= rightValue.value()));
+        }
+        else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
+            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            int comparison = currencyLeft.getValue().compareTo(currencyRight.getValue());
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+                    currencyLeft.getName().equals(currencyRight.getName()) && (comparison >= 0)));
+        }
     }
 
     @Override
     public void visit(LesserOrEqualExpression lesserOrEqualExpression) {
-
+        lesserOrEqualExpression.left().accept(this);
+        Value left = lastResult;
+        lesserOrEqualExpression.right().accept(this);
+        Value right = lastResult;
+        if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
+            IntPrimitive leftValue = (IntPrimitive) left.value();
+            IntPrimitive rightValue = (IntPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, (leftValue.value() <= rightValue.value()));
+        }
+        else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
+            FloatPrimitive leftValue = (FloatPrimitive) left.value();
+            FloatPrimitive rightValue = (FloatPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftValue.value() <= rightValue.value()));
+        }
+        else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
+            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            int comparison = currencyLeft.getValue().compareTo(currencyRight.getValue());
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+                    currencyLeft.getName().equals(currencyRight.getName()) && (comparison <= 0)));
+        }
     }
 
     @Override
@@ -227,7 +357,6 @@ public class Interpreter implements Interpretable, Visitor {
             lastResult = new Value(PrimitiveType.FLOAT, new FloatPrimitive(leftValue.value() - rightValue.value()));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
-            System.out.println(left);
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
             if (currencyLeft.getName().equals(currencyRight.getName())) {
@@ -336,10 +465,11 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(NegationExpression negationExpression) {
-        negationExpression.accept(this);
+        negationExpression.expression().accept(this);
         Value result = lastResult;
         if (result.valueType() == PrimitiveType.BOOL) {
-            lastResult = new Value(PrimitiveType.BOOL, !(Boolean) result.value());
+            BoolPrimitive boolValue = (BoolPrimitive) result.value();
+            lastResult = new Value(PrimitiveType.BOOL, !boolValue.value());
         }
         else {
             System.out.println("NEGATION NOT POSSIBLE");
@@ -348,16 +478,19 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(MinusExpression minusExpression) {
-        minusExpression.accept(this);
+        minusExpression.expression().accept(this);
         Value result = lastResult;
         if (result.valueType() == PrimitiveType.INTEGER) {
-            lastResult = new Value(result.valueType(), -(Integer) result.value());
+            IntPrimitive intValue = (IntPrimitive) result.value();
+            lastResult = new Value(result.valueType(), -intValue.value());
         }
         else if (result.valueType() == PrimitiveType.FLOAT) {
-            lastResult = new Value(result.valueType(), -(Double) result.value());
+            FloatPrimitive floatValue = (FloatPrimitive) result.value();
+            lastResult = new Value(result.valueType(), -floatValue.value());
         }
         else if (result.valueType() == PrimitiveType.CURRENCY) {
-            BigDecimal value = BigDecimal.valueOf(-(Double) result.value());
+            CurrencyPrimitive currencyValue = (CurrencyPrimitive) result.value();
+            BigDecimal value = currencyValue.getValue().negate();
             lastResult = new Value(result.valueType(), value);
         }
         else {
