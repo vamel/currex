@@ -19,8 +19,8 @@ public class ContextManager {
         contexts.pop();
     }
 
-    public void addVariable(Variable variable) {
-        contexts.getLast().addVariable(variable);
+    public void addVariable(String name, Value value) {
+        contexts.getLast().addVariable(name, value);
     }
 
     public void updateVariable(String name, Value newValue) {
@@ -35,7 +35,7 @@ public class ContextManager {
         System.out.println("VariableDoesNotExistError(VARIABLE " + name + " DOES NOT EXIST IN ANY CONTEXT");
     }
 
-    public Variable fetchVariable(String name) {
+    public Value fetchVariable(String name) {
         Iterator<Context> iterator = contexts.descendingIterator();
         while (iterator.hasNext()) {
             Context currentContext = iterator.next();

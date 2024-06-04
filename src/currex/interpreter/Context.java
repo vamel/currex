@@ -3,33 +3,33 @@ package currex.interpreter;
 import java.util.HashMap;
 
 public class Context {
-    private final HashMap<String, Variable> variables;
+    private final HashMap<String, Value> variables;
 
-    public Context(HashMap<String, Variable> variables) {
+    public Context(HashMap<String, Value> variables) {
         this.variables = variables;
     }
 
-    public HashMap<String, Variable> getVariables() {
+    public HashMap<String, Value> getVariables() {
         return variables;
     }
 
-    public Variable getVariable(String name) {
+    public Value getVariable(String name) {
         return variables.get(name);
     }
 
-    public void addVariable(Variable variable) {
-        if (variables.containsKey(variable.name())) {
-            System.out.println("VariableAlreadyExistsError(VARIABLE  + " + variable.name() + " HAS BEEN ALREADY DEFINED");
+    public void addVariable(String name, Value value) {
+        if (variables.containsKey(name)) {
+            System.out.println("VariableAlreadyExistsError(VARIABLE  + " + name + " HAS BEEN ALREADY DEFINED");
         }
-        variables.put(variable.name(), variable);
+        variables.put(name, value);
     }
 
     public void updateVariable(String name, Value newValue) {
-        Variable previous = variables.get(name);
-        if (previous.value().valueType() != newValue.valueType()) {
-            System.out.println("InvalidVariableTypeError(VARIABLE " + name + " WITH TYPE " + previous.value().valueType() +
+        Value previous = variables.get(name);
+        if (previous.valueType() != newValue.valueType()) {
+            System.out.println("InvalidVariableTypeError(VARIABLE " + name + " WITH TYPE " + previous.valueType() +
                     " CANNOT BE ASSIGNED WITH VALUE " + newValue.value() + " WITH TYPE " + newValue.valueType());
         }
-        variables.put(name, new Variable(name, newValue));
+        variables.put(name, newValue);
     }
 }

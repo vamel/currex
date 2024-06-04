@@ -25,12 +25,6 @@ public class Interpreter implements Interpretable, Visitor {
     private boolean isReturn = false;
 
 
-    private Value copyLastResult() {
-        Value lastResultCopy = lastResult;
-        lastResult = null;
-        return lastResultCopy;
-    }
-
     public Interpreter(ConversionTable conversionTable) {
         this.conversionTable = conversionTable;
     }
@@ -72,9 +66,8 @@ public class Interpreter implements Interpretable, Visitor {
         if (lastResult.valueType() != declarationStatement.type()) {
             System.out.println("INVALID VARIABLE TYPE");
         }
-        Variable variable = new Variable(declarationStatement.name(), new Value(
-                declarationStatement.type(), lastResult));
-        currentContext.addVariable(variable);
+        currentContext.addVariable(declarationStatement.name(), new Value(
+                declarationStatement.type(), lastResult.value()));
     }
 
     @Override
@@ -140,7 +133,30 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(EqualExpression equalExpression) {
-
+        equalExpression.left().accept(this);
+        Value left = lastResult;
+        equalExpression.right().accept(this);
+        Value right = lastResult;
+        if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
+            IntPrimitive leftValue = (IntPrimitive) left.value();
+            IntPrimitive rightValue = (IntPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, (leftValue.value().equals(rightValue.value())));
+        }
+        else if (left.valueType() == PrimitiveType.BOOL && right.valueType() == PrimitiveType.BOOL) {
+            BoolPrimitive leftBool = (BoolPrimitive) left.value();
+            BoolPrimitive rightBool = (BoolPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftBool.value() == rightBool.value()));
+        }
+//        else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
+//            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(left.value() == right.value()));
+//        }
+//        else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
+//            CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
+//            CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+//            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+//                    currencyLeft.getName().equals(currencyRight.getName()) &&
+//                            currencyLeft.getValue().equals(currencyRight.getValue())));
+//        }
     }
 
     @Override
@@ -371,8 +387,7 @@ public class Interpreter implements Interpretable, Visitor {
                 System.out.println("INVALID ARGUMENT TYPE");
             }
             else {
-                Variable variable = new Variable(param.name(), new Value(param.type(), lastResult));
-                functionCallContext.addVariable(variable);
+                functionCallContext.addVariable(param.name(), new Value(param.type(), lastResult));
             }
         }
         contextManager.addContext(functionCallContext);
@@ -391,12 +406,12 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(IdentifierExpression identifierExpression) {
-        Variable variable = contextManager.fetchVariable(identifierExpression.name());
-        if (variable == null) {
+        Value value = contextManager.fetchVariable(identifierExpression.name());
+        if (value == null) {
             System.out.println("VariableDoesNotExistError(VARIABLE " + identifierExpression.name() + " DOES NOT EXIST IN ANY CONTEXT");
         }
         else {
-            lastResult = variable.value();
+            lastResult = value;
         }
     }
 
@@ -423,5 +438,11 @@ public class Interpreter implements Interpretable, Visitor {
     @Override
     public void visit(CurrencyPrimitive currencyPrimitive) {
         lastResult = new Value(PrimitiveType.CURRENCY, currencyPrimitive);
+    }
+
+    private Value copyLastResult() {
+        Value lastResultCopy = lastResult;
+        lastResult = null;
+        return lastResultCopy;
     }
 }
