@@ -74,7 +74,6 @@ public class Interpreter implements Interpretable, Visitor {
     @Override
     public void visit(AssignmentStatement assignmentStatement) {
         assignmentStatement.left().accept(this);
-        Value leftValue = copyLastResult();
         assignmentStatement.right().accept(this);
         if (lastResult != null) {
             Value rightValue = copyLastResult();
@@ -99,7 +98,14 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(WhileStatement whileStatement) {
-
+        whileStatement.expression().accept(this);
+        Value check = lastResult;
+        BoolPrimitive checkValue = (BoolPrimitive) check.value();
+        while (checkValue.value()) {
+            whileStatement.block().accept(this);
+            whileStatement.expression().accept(this);
+            checkValue = (BoolPrimitive) lastResult.value();
+        }
     }
 
     @Override
@@ -136,12 +142,54 @@ public class Interpreter implements Interpretable, Visitor {
 
     @Override
     public void visit(OrExpression orExpression) {
-
+        orExpression.left().accept(this);
+        Value left = lastResult;
+        if (left.valueType() == PrimitiveType.BOOL) {
+            BoolPrimitive leftBool = (BoolPrimitive) left.value();
+            if (leftBool.value()) {
+                lastResult = new Value(PrimitiveType.BOOL, true);
+                return;
+            }
+        }
+        orExpression.right().accept(this);
+        Value right = lastResult;
+        if (right.valueType() == PrimitiveType.BOOL) {
+            BoolPrimitive rightBool = (BoolPrimitive) right.value();
+            if (rightBool.value()) {
+                lastResult = new Value(PrimitiveType.BOOL, true);
+            }
+            else {
+                lastResult = new Value(PrimitiveType.BOOL, false);
+            }
+            return;
+        }
+        System.out.println("OR STATEMENT CANNOT BE EVALUATED!");
     }
 
     @Override
     public void visit(AndExpression andExpression) {
-
+        andExpression.left().accept(this);
+        Value left = lastResult;
+        if (left.valueType() == PrimitiveType.BOOL) {
+            BoolPrimitive leftBool = (BoolPrimitive) left.value();
+            if (!leftBool.value()) {
+                lastResult = new Value(PrimitiveType.BOOL, false);
+                return;
+            }
+        }
+        andExpression.right().accept(this);
+        Value right = lastResult;
+        if (right.valueType() == PrimitiveType.BOOL) {
+            BoolPrimitive rightBool = (BoolPrimitive) right.value();
+            if (rightBool.value()) {
+                lastResult = new Value(PrimitiveType.BOOL, true);
+            }
+            else {
+                lastResult = new Value(PrimitiveType.BOOL, false);
+            }
+            return;
+        }
+        System.out.println("AND STATEMENT CANNOT BE EVALUATED!");
     }
 
     @Override
