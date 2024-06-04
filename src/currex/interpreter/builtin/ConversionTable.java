@@ -18,7 +18,8 @@ public class ConversionTable {
             putColumnCurrency(currencyName.name());
         }
         for (ConversionRowExpression conversionRow : currencyTable.conversionRows()) {
-            putRowCurrency(conversionRow.currencyName().name());
+            String currentCurrency = conversionRow.currencyName().name();
+            putRowCurrency(currentCurrency);
             List<Double> conversionList = new ArrayList<>();
             for (ConversionRateExpression rate : conversionRow.currencyRates()) {
                 conversionList.add(rate.conversion());

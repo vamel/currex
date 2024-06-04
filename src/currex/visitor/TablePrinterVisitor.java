@@ -23,7 +23,6 @@ public class TablePrinterVisitor implements TableVisitor {
 
     @Override
     public void visit(CurrencyRowExpression currencyRow) {
-        System.out.println(currencyRow);
         increaseIdentation();
         System.out.println(ident.repeat(identation) + "<CurrencyRowExpression>");
         for (CurrencyIdentifierExpression identifier : currencyRow.currencyNames()) {

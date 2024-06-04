@@ -1,5 +1,6 @@
 package currex.interpreter;
 
+import currex.interpreter.builtin.ConversionTable;
 import currex.structure.components.Block;
 import currex.structure.components.FunctionDefinition;
 import currex.structure.components.Parameter;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class Interpreter implements Interpretable, Visitor {
     private final ContextManager contextManager = new ContextManager();
     private final Map<String, FunctionDefinition> functionDefinitions = new HashMap<>();
+    private final ConversionTable conversionTable;
     private Value lastResult = null;
     private boolean isReturn = false;
 
@@ -27,6 +29,10 @@ public class Interpreter implements Interpretable, Visitor {
         Value lastResultCopy = lastResult;
         lastResult = null;
         return lastResultCopy;
+    }
+
+    public Interpreter(ConversionTable conversionTable) {
+        this.conversionTable = conversionTable;
     }
 
     @Override
