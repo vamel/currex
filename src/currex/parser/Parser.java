@@ -169,7 +169,7 @@ public class Parser {
         }
         consumeToken();
         if (!checkTokenType(TokenType.IDENTIFIER)) {
-            errorHandler.handleParserError(new InvalidIdentifierError("INVALID PARAMETER NAME!"),
+            errorHandler.handleParserError(new InvalidIdentifierError("INVALID IDENTIFIER NAME!"),
                     new Position(currentToken.getPosition()));
         }
         String variableName = (String) currentToken.getValue();

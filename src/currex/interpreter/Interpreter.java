@@ -10,6 +10,7 @@ import currex.structure.expressions.*;
 import currex.structure.primitives.*;
 import currex.structure.statements.*;
 import currex.utils.CurrexConfig;
+import currex.utils.CurrexLimits;
 import currex.visitor.Visitor;
 
 import java.io.PrintStream;
@@ -109,6 +110,11 @@ public class Interpreter implements Interpretable, Visitor {
     public void visit(WhileStatement whileStatement) throws Exception {
         whileStatement.expression().accept(this);
         Value check = copyLastResult();
+        if (check.valueType() != PrimitiveType.BOOL) {
+            errorHandler.handleInterpreterError(new InvalidBoolValueError(
+                    "EVALUATED EXPRESSION DOES NOT GIVE A BOOL VALUE!"
+            ));
+        }
         Boolean checkValue = (Boolean) check.value();
         while (checkValue) {
             contextManager.addContext(new Context());
@@ -237,6 +243,16 @@ public class Interpreter implements Interpretable, Visitor {
                     currencyLeft.getName().equals(currencyRight.getName()) &&
                             currencyLeft.getValue().equals(currencyRight.getValue())));
         }
+        else if (left.valueType() == PrimitiveType.STRING && right.valueType() == PrimitiveType.STRING) {
+            StringPrimitive leftValue = (StringPrimitive) left.value();
+            StringPrimitive rightValue = (StringPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+                    leftValue.value().equals(rightValue.value())));
+        }
+        else {
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("TYPE " + left.valueType() +
+                    " CANNOT BE COMPARED WITH TYPE " + right.valueType() + "!"));
+        }
     }
 
     @Override
@@ -267,6 +283,16 @@ public class Interpreter implements Interpretable, Visitor {
                     !currencyLeft.getName().equals(currencyRight.getName()) ||
                             !currencyLeft.getValue().equals(currencyRight.getValue())));
         }
+        else if (left.valueType() == PrimitiveType.STRING && right.valueType() == PrimitiveType.STRING) {
+            StringPrimitive leftValue = (StringPrimitive) left.value();
+            StringPrimitive rightValue = (StringPrimitive) right.value();
+            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+                    !leftValue.value().equals(rightValue.value())));
+        }
+        else {
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("TYPE " + left.valueType() +
+                    " CANNOT BE COMPARED WITH TYPE " + right.valueType() + "!"));
+        }
     }
 
     @Override
@@ -288,9 +314,18 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            if (!currencyLeft.getName().equals(currencyRight.getName())) {
+                errorHandler.handleInterpreterError(new InvalidCurrencyNameError(
+                        "CURRENCY " + currencyLeft.getName() + " CANNOT BE COMPARED TO " + currencyRight.getName()
+                ));
+            }
             int comparison = currencyLeft.getValue().compareTo(currencyRight.getValue());
             lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
                     currencyLeft.getName().equals(currencyRight.getName()) && (comparison > 0)));
+        }
+        else {
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("TYPE " + left.valueType() +
+                    " CANNOT BE COMPARED WITH TYPE " + right.valueType() + "!"));
         }
     }
 
@@ -314,8 +349,17 @@ public class Interpreter implements Interpretable, Visitor {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
             int comparison = currencyLeft.getValue().compareTo(currencyRight.getValue());
+            if (!currencyLeft.getName().equals(currencyRight.getName())) {
+                errorHandler.handleInterpreterError(new InvalidCurrencyNameError(
+                        "CURRENCY " + currencyLeft.getName() + " CANNOT BE COMPARED TO " + currencyRight.getName()
+                ));
+            }
             lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
                     currencyLeft.getName().equals(currencyRight.getName()) && (comparison < 0)));
+        }
+        else {
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("TYPE " + left.valueType() +
+                    " CANNOT BE COMPARED WITH TYPE " + right.valueType() + "!"));
         }
     }
 
@@ -339,8 +383,17 @@ public class Interpreter implements Interpretable, Visitor {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
             int comparison = currencyLeft.getValue().compareTo(currencyRight.getValue());
+            if (!currencyLeft.getName().equals(currencyRight.getName())) {
+                errorHandler.handleInterpreterError(new InvalidCurrencyNameError(
+                        "CURRENCY " + currencyLeft.getName() + " CANNOT BE COMPARED TO " + currencyRight.getName()
+                ));
+            }
             lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
                     currencyLeft.getName().equals(currencyRight.getName()) && (comparison >= 0)));
+        }
+        else {
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("TYPE " + left.valueType() +
+                    " CANNOT BE COMPARED WITH TYPE " + right.valueType() + "!"));
         }
     }
 
@@ -363,9 +416,18 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
+            if (!currencyLeft.getName().equals(currencyRight.getName())) {
+                errorHandler.handleInterpreterError(new InvalidCurrencyNameError(
+                        "CURRENCY " + currencyLeft.getName() + " CANNOT BE COMPARED TO " + currencyRight.getName()
+                ));
+            }
             int comparison = currencyLeft.getValue().compareTo(currencyRight.getValue());
             lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
                     currencyLeft.getName().equals(currencyRight.getName()) && (comparison <= 0)));
+        }
+        else {
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("TYPE " + left.valueType() +
+                    " CANNOT BE COMPARED WITH TYPE " + right.valueType() + "!"));
         }
     }
 
@@ -378,6 +440,9 @@ public class Interpreter implements Interpretable, Visitor {
         if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
             IntPrimitive leftValue = (IntPrimitive) left.value();
             IntPrimitive rightValue = (IntPrimitive) right.value();
+            if (CurrexLimits.INTEGER_MAX_VALUE - leftValue.value() < rightValue.value()) {
+                errorHandler.handleInterpreterError(new OverflowError("INTEGER VALUE IS TOO BIG!"));
+            }
             lastResult = new Value(PrimitiveType.INTEGER, new IntPrimitive(leftValue.value() + rightValue.value()));
         }
         else if ((left.valueType() == PrimitiveType.INTEGER || left.valueType() == PrimitiveType.FLOAT) &&
@@ -459,6 +524,10 @@ public class Interpreter implements Interpretable, Visitor {
         if (left.valueType() == PrimitiveType.INTEGER && right.valueType() == PrimitiveType.INTEGER) {
             IntPrimitive leftValue = (IntPrimitive) left.value();
             IntPrimitive rightValue = (IntPrimitive) right.value();
+            if (leftValue.value() != 0 &&
+                    CurrexLimits.INTEGER_MAX_VALUE / leftValue.value() < rightValue.value()) {
+                errorHandler.handleInterpreterError(new OverflowError("INTEGER VALUE IS TOO BIG!"));
+            }
             lastResult = new Value(PrimitiveType.INTEGER, new IntPrimitive(leftValue.value() * rightValue.value()));
         }
         else if ((left.valueType() == PrimitiveType.INTEGER || left.valueType() == PrimitiveType.FLOAT) &&
@@ -543,7 +612,12 @@ public class Interpreter implements Interpretable, Visitor {
             CurrencyPrimitive leftValue = (CurrencyPrimitive) left.value();
             String rightValue = "";
             if (right.valueType() == PrimitiveType.STRING) {
-                rightValue = (String) right.value();
+                try {
+                    rightValue = (String) right.value();
+                } catch (ClassCastException e) {
+                    errorHandler.handleInterpreterError(new InvalidCurrencyNameError("CURRENCY " +
+                            right.value() + " IS NOT CORRECT"));
+                }
             }
             else if (right.valueType() == PrimitiveType.CURRENCY) {
                 CurrencyPrimitive rightCurrency = (CurrencyPrimitive) right.value();
@@ -572,7 +646,12 @@ public class Interpreter implements Interpretable, Visitor {
             CurrencyPrimitive leftValue = (CurrencyPrimitive) left.value();
             String rightValue = "";
             if (right.valueType() == PrimitiveType.STRING) {
-                rightValue = (String) right.value();
+                try {
+                    rightValue = (String) right.value();
+                } catch (ClassCastException e) {
+                    errorHandler.handleInterpreterError(new InvalidCurrencyNameError("CURRENCY " +
+                            right.value() + " IS NOT CORRECT"));
+                }
             }
             else if (right.valueType() == PrimitiveType.CURRENCY) {
                 CurrencyPrimitive rightCurrency = (CurrencyPrimitive) right.value();
@@ -648,7 +727,7 @@ public class Interpreter implements Interpretable, Visitor {
             FunctionDefinition function = functionDefinitions.get(functionCall.name());
             if (function == null) {
                 errorHandler.handleInterpreterError(new FunctionDoesNotExistError(
-                        "METHOD WITH NAME" + functionCall.name() + "DOES NOT EXIST!"
+                        "METHOD WITH NAME " + functionCall.name() + " DOES NOT EXIST!"
                 ));
                 return;
             }
@@ -673,10 +752,10 @@ public class Interpreter implements Interpretable, Visitor {
         }
         FunctionDefinition functionDefinition = functionDefinitions.get(functionCallExpression.name());
         if (functionDefinition.parameters().size() != functionCallExpression.arguments().size()) {
-            errorHandler.handleInterpreterError(new InvalidFunctionDefinitionError(
+            errorHandler.handleInterpreterError(new InvalidFunctionCallError(
                     "INVALID NUMBER OF ARGUMENTS FOR FUNCTION " +
                             functionDefinition.name() +
-                            "EXPECTED: " + functionDefinition.parameters().size() +
+                            " EXPECTED: " + functionDefinition.parameters().size() +
                             " BUT RECEIVED: " + functionCallExpression.arguments().size() + "!"
             ));
         }
