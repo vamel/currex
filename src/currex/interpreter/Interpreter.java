@@ -177,8 +177,8 @@ public class Interpreter implements Interpretable, Visitor {
         orExpression.right().accept(this);
         Value right = copyLastResult();
         if (right.valueType() == PrimitiveType.BOOL) {
-            BoolPrimitive rightBool = (BoolPrimitive) right.value();
-            if (rightBool.value()) {
+            Boolean rightBool = (Boolean) right.value();
+            if (rightBool) {
                 lastResult = new Value(PrimitiveType.BOOL, true);
             }
             else {
@@ -194,8 +194,8 @@ public class Interpreter implements Interpretable, Visitor {
         andExpression.left().accept(this);
         Value left = copyLastResult();
         if (left.valueType() == PrimitiveType.BOOL) {
-            BoolPrimitive leftBool = (BoolPrimitive) left.value();
-            if (!leftBool.value()) {
+            Boolean leftBool = (Boolean) left.value();
+            if (!leftBool) {
                 lastResult = new Value(PrimitiveType.BOOL, false);
                 return;
             }
@@ -203,8 +203,8 @@ public class Interpreter implements Interpretable, Visitor {
         andExpression.right().accept(this);
         Value right = copyLastResult();
         if (right.valueType() == PrimitiveType.BOOL) {
-            BoolPrimitive rightBool = (BoolPrimitive) right.value();
-            if (rightBool.value()) {
+            Boolean rightBool = (Boolean) right.value();
+            if (rightBool) {
                 lastResult = new Value(PrimitiveType.BOOL, true);
             }
             else {
@@ -229,24 +229,24 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.BOOL && right.valueType() == PrimitiveType.BOOL) {
             BoolPrimitive leftBool = (BoolPrimitive) left.value();
             BoolPrimitive rightBool = (BoolPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftBool.value() == rightBool.value()));
+            lastResult = new Value(PrimitiveType.BOOL, (leftBool.value() == rightBool.value()));
         }
         else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
             FloatPrimitive leftValue = (FloatPrimitive) left.value();
             FloatPrimitive rightValue = (FloatPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftValue.value().equals(rightValue.value())));
+            lastResult = new Value(PrimitiveType.BOOL, (leftValue.value().equals(rightValue.value())));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+            lastResult = new Value(PrimitiveType.BOOL, (
                     currencyLeft.getName().equals(currencyRight.getName()) &&
                             currencyLeft.getValue().equals(currencyRight.getValue())));
         }
         else if (left.valueType() == PrimitiveType.STRING && right.valueType() == PrimitiveType.STRING) {
             StringPrimitive leftValue = (StringPrimitive) left.value();
             StringPrimitive rightValue = (StringPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+            lastResult = new Value(PrimitiveType.BOOL, (
                     leftValue.value().equals(rightValue.value())));
         }
         else {
@@ -269,24 +269,24 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.BOOL && right.valueType() == PrimitiveType.BOOL) {
             BoolPrimitive leftBool = (BoolPrimitive) left.value();
             BoolPrimitive rightBool = (BoolPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(!leftBool.value() == rightBool.value()));
+            lastResult = new Value(PrimitiveType.BOOL, (!leftBool.value() == rightBool.value()));
         }
         else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
             FloatPrimitive leftValue = (FloatPrimitive) left.value();
             FloatPrimitive rightValue = (FloatPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(!leftValue.value().equals(rightValue.value())));
+            lastResult = new Value(PrimitiveType.BOOL, (!leftValue.value().equals(rightValue.value())));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+            lastResult = new Value(PrimitiveType.BOOL, (
                     !currencyLeft.getName().equals(currencyRight.getName()) ||
                             !currencyLeft.getValue().equals(currencyRight.getValue())));
         }
         else if (left.valueType() == PrimitiveType.STRING && right.valueType() == PrimitiveType.STRING) {
             StringPrimitive leftValue = (StringPrimitive) left.value();
             StringPrimitive rightValue = (StringPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+            lastResult = new Value(PrimitiveType.BOOL, (
                     !leftValue.value().equals(rightValue.value())));
         }
         else {
@@ -309,7 +309,7 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
             FloatPrimitive leftValue = (FloatPrimitive) left.value();
             FloatPrimitive rightValue = (FloatPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftValue.value() > rightValue.value()));
+            lastResult = new Value(PrimitiveType.BOOL, (leftValue.value() > rightValue.value()));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
@@ -320,7 +320,7 @@ public class Interpreter implements Interpretable, Visitor {
                 ));
             }
             int comparison = currencyLeft.getValue().compareTo(currencyRight.getValue());
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+            lastResult = new Value(PrimitiveType.BOOL, (
                     currencyLeft.getName().equals(currencyRight.getName()) && (comparison > 0)));
         }
         else {
@@ -343,7 +343,7 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
             FloatPrimitive leftValue = (FloatPrimitive) left.value();
             FloatPrimitive rightValue = (FloatPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftValue.value() < rightValue.value()));
+            lastResult = new Value(PrimitiveType.BOOL, (leftValue.value() < rightValue.value()));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
@@ -354,7 +354,7 @@ public class Interpreter implements Interpretable, Visitor {
                         "CURRENCY " + currencyLeft.getName() + " CANNOT BE COMPARED TO " + currencyRight.getName()
                 ));
             }
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+            lastResult = new Value(PrimitiveType.BOOL, (
                     currencyLeft.getName().equals(currencyRight.getName()) && (comparison < 0)));
         }
         else {
@@ -377,7 +377,7 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
             FloatPrimitive leftValue = (FloatPrimitive) left.value();
             FloatPrimitive rightValue = (FloatPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftValue.value() >= rightValue.value()));
+            lastResult = new Value(PrimitiveType.BOOL, (leftValue.value() >= rightValue.value()));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
@@ -388,7 +388,7 @@ public class Interpreter implements Interpretable, Visitor {
                         "CURRENCY " + currencyLeft.getName() + " CANNOT BE COMPARED TO " + currencyRight.getName()
                 ));
             }
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+            lastResult = new Value(PrimitiveType.BOOL, (
                     currencyLeft.getName().equals(currencyRight.getName()) && (comparison >= 0)));
         }
         else {
@@ -411,7 +411,7 @@ public class Interpreter implements Interpretable, Visitor {
         else if (left.valueType() == PrimitiveType.FLOAT && right.valueType() == PrimitiveType.FLOAT) {
             FloatPrimitive leftValue = (FloatPrimitive) left.value();
             FloatPrimitive rightValue = (FloatPrimitive) right.value();
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(leftValue.value() <= rightValue.value()));
+            lastResult = new Value(PrimitiveType.BOOL, (leftValue.value() <= rightValue.value()));
         }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
@@ -422,7 +422,7 @@ public class Interpreter implements Interpretable, Visitor {
                 ));
             }
             int comparison = currencyLeft.getValue().compareTo(currencyRight.getValue());
-            lastResult = new Value(PrimitiveType.BOOL, new BoolPrimitive(
+            lastResult = new Value(PrimitiveType.BOOL, (
                     currencyLeft.getName().equals(currencyRight.getName()) && (comparison <= 0)));
         }
         else {
