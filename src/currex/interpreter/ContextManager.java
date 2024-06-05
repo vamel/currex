@@ -13,10 +13,6 @@ public class ContextManager {
     private final Deque<Context> contexts = new ArrayDeque<>();
     private final InterpreterErrorHandler errorHandler = new InterpreterErrorHandler();
 
-    public Context getLastContext() {
-        return contexts.getLast();
-    }
-
     public void addContext(Context context) {
         contexts.add(context);
     }

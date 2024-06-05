@@ -109,13 +109,13 @@ public class Interpreter implements Interpretable, Visitor {
     public void visit(WhileStatement whileStatement) throws Exception {
         whileStatement.expression().accept(this);
         Value check = copyLastResult();
-        BoolPrimitive checkValue = (BoolPrimitive) check.value();
-        while (checkValue.value()) {
+        Boolean checkValue = (Boolean) check.value();
+        while (checkValue) {
             contextManager.addContext(new Context());
             whileStatement.block().accept(this);
             contextManager.removeCurrentContext();
             whileStatement.expression().accept(this);
-            checkValue = (BoolPrimitive) lastResult.value();
+            checkValue = (Boolean) lastResult.value();
         }
     }
 
@@ -148,8 +148,8 @@ public class Interpreter implements Interpretable, Visitor {
                     "EVALUATED EXPRESSION DOES NOT GIVE A BOOL VALUE!"
             ));
         }
-        BoolPrimitive leftBool = (BoolPrimitive) check.value();
-        if (leftBool.value()) {
+        Boolean leftBool = (Boolean) check.value();
+        if (leftBool) {
             isIfStatement = true;
             contextManager.addContext(new Context());
             elseStatement.block().accept(this);
