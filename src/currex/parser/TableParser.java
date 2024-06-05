@@ -95,8 +95,9 @@ public class TableParser {
                 currentToken.getTokenType() == TokenType.FLOAT_VALUE ||
                 currentToken.getTokenType() == TokenType.MINUS) {
             if (rowConversionRates.size() == CurrexConfig.MAX_CONVERSION_TABLE_SIZE) {
-                errorHandler.handleParserError(new TooManyCurrenciesError("TOO MANY CURRENCIES IN A ROW, " +
-                                "EXPECTED " + CurrexConfig.MAX_CONVERSION_TABLE_SIZE + " BUT RECEIVED MORE!"),
+                errorHandler.handleParserError(new TooManyCurrencyRatesError("TOO MANY CURRENCIES IN A ROW, " +
+                                "EXPECTED " + CurrexConfig.MAX_CONVERSION_TABLE_SIZE + " BUT RECEIVED" +
+                                (CurrexConfig.MAX_CONVERSION_TABLE_SIZE + 1) + "!"),
                         new Position(currentToken.getPosition()));
             }
             if (currentToken.getTokenType() == TokenType.MINUS) {
@@ -105,6 +106,10 @@ public class TableParser {
             }
             ConversionRateExpression conversionRate = parseConversionRate();
             rowConversionRates.add(conversionRate);
+        }
+        if (currentToken.getTokenType() == TokenType.IDENTIFIER) {
+            errorHandler.handleParserError(new InvalidCurrencyRateError("INVALID CURRENCY RATE " + currentToken.getValue()),
+                    new Position(currentToken.getPosition()));
         }
         if (!consumeIf(TokenType.SEMICOLON) && !checkTokenType(TokenType.EOF)) {
             errorHandler.handleParserError(new MissingSemicolonError("MISSING SEMICOLON AT THE END OF THE LINE!"),
