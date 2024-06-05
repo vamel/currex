@@ -9,6 +9,10 @@ public class Context {
         this.variables = variables;
     }
 
+    public Context() {
+        this.variables = new HashMap<>();
+    }
+
     public HashMap<String, Value> getVariables() {
         return variables;
     }

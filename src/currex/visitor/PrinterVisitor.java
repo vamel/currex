@@ -1,5 +1,8 @@
 package currex.visitor;
 
+import currex.interpreter.builtin.GetBalanceMethod;
+import currex.interpreter.builtin.GetCurrencyMethod;
+import currex.interpreter.builtin.PrintFunction;
 import currex.structure.components.Block;
 import currex.structure.components.FunctionDefinition;
 import currex.structure.components.Parameter;
@@ -347,6 +350,27 @@ public class PrinterVisitor implements Visitor {
         System.out.println(ident.repeat(identation) +
                 "<CurrencyPrimitive value=" + currencyPrimitive.getValue() +
                 " type=" + currencyPrimitive.getName() + ">");
+        decreaseIdendation();
+    }
+
+    @Override
+    public void visit(PrintFunction printFunction) {
+        increaseIdentation();
+        System.out.println("<PrintStatement>");
+        decreaseIdendation();
+    }
+
+    @Override
+    public void visit(GetBalanceMethod getBalanceMethod) {
+        increaseIdentation();
+        System.out.println("<GetBalance method>");
+        decreaseIdendation();
+    }
+
+    @Override
+    public void visit(GetCurrencyMethod getCurrencyMethod) {
+        increaseIdentation();
+        System.out.println("<GetCurrency method>");
         decreaseIdendation();
     }
 

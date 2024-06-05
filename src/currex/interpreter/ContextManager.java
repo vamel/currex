@@ -12,11 +12,11 @@ public class ContextManager {
     }
 
     public void addContext(Context context) {
-        contexts.push(context);
+        contexts.add(context);
     }
 
     public void removeCurrentContext() {
-        contexts.pop();
+        contexts.removeLast();
     }
 
     public void addVariable(String name, Value value) {

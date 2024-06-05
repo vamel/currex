@@ -1,5 +1,8 @@
 package currex.visitor;
 
+import currex.interpreter.builtin.GetBalanceMethod;
+import currex.interpreter.builtin.GetCurrencyMethod;
+import currex.interpreter.builtin.PrintFunction;
 import currex.structure.components.Block;
 import currex.structure.components.FunctionDefinition;
 import currex.structure.components.Parameter;
@@ -46,4 +49,8 @@ public interface Visitor {
     void visit(StringPrimitive stringPrimitive);
     void visit(BoolPrimitive boolPrimitive);
     void visit(CurrencyPrimitive currencyPrimitive);
+
+    void visit(PrintFunction printFunction);
+    void visit(GetBalanceMethod getBalanceMethod);
+    void visit(GetCurrencyMethod getCurrencyMethod);
 }

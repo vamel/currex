@@ -1,9 +1,8 @@
 package currex.interpreter.builtin;
 
-import currex.structure.statements.Statement;
 import currex.visitor.Visitor;
 
-public record PrintFunction() implements Statement {
+public record GetCurrencyMethod() implements Method {
 
     @Override
     public void accept(Visitor visitor) {

@@ -412,7 +412,8 @@ public class Parser {
         while (checkTokenType(TokenType.AT) || checkTokenType(TokenType.ARROW)) {
             tokenType = currentToken.getTokenType();
             consumeToken();
-            Expression rightExpression = parseIdentifierOrFunctionCall();
+//            Expression rightExpression = parseIdentifierOrFunctionCall();
+            Expression rightExpression = parseUnaryExpression();
             if (rightExpression == null) {
                 errorHandler.handleParserError(new MissingExpressionError("MISSING SECOND EXPRESSION!"),
                         new Position(currentToken.getPosition()));
