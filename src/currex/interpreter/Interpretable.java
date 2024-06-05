@@ -4,5 +4,5 @@ import currex.structure.components.Program;
 
 public interface Interpretable {
 
-    void run(Program program);
+    void run(Program program) throws Exception;
 }

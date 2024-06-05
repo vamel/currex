@@ -8,7 +8,7 @@ import java.util.Map;
 public record Program(Map<String, FunctionDefinition> functionDefinitions) implements Visitable {
 
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(Visitor visitor) throws Exception {
         visitor.visit(this);
     }
 }

@@ -1,7 +1,7 @@
 package currex.interpreter.error;
 
 public class MainFunctionNotDefinedError extends Exception {
-    MainFunctionNotDefinedError(String message) {
+    public MainFunctionNotDefinedError(String message) {
         super(message);
     }
 }

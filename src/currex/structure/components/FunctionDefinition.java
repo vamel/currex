@@ -10,7 +10,7 @@ public record FunctionDefinition(PrimitiveType returnType, String name,
                                  List<Parameter> parameters, Block block) implements Visitable {
 
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(Visitor visitor) throws Exception {
         visitor.visit(this);
     }
 }

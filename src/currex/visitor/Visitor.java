@@ -12,37 +12,37 @@ import currex.structure.primitives.*;
 import currex.structure.statements.*;
 
 public interface Visitor {
-    void visit(Program program);
-    void visit(Block block);
-    void visit(FunctionDefinition functionDefinition);
+    void visit(Program program) throws Exception;
+    void visit(Block block) throws Exception;
+    void visit(FunctionDefinition functionDefinition) throws Exception;
     void visit(Parameter parameter);
 
-    void visit(DeclarationStatement declarationStatement);
-    void visit(AssignmentStatement assignmentStatement);
-    void visit(ReturnStatement returnStatement);
-    void visit(WhileStatement whileStatement);
-    void visit(IfStatement ifStatement);
-    void visit(ElseStatement elseStatement);
+    void visit(DeclarationStatement declarationStatement) throws Exception;
+    void visit(AssignmentStatement assignmentStatement) throws Exception;
+    void visit(ReturnStatement returnStatement) throws Exception;
+    void visit(WhileStatement whileStatement) throws Exception;
+    void visit(IfStatement ifStatement) throws Exception;
+    void visit(ElseStatement elseStatement) throws Exception;
 
-    void visit(OrExpression orExpression);
-    void visit(AndExpression andExpression);
-    void visit(GreaterExpression greaterExpression);
-    void visit(LesserExpression lesserExpression);
-    void visit(EqualExpression equalExpression);
-    void visit(NotEqualExpression notEqualExpression);
-    void visit(GreaterOrEqualExpression greaterOrEqualExpression);
-    void visit(LesserOrEqualExpression lesserOrEqualExpression);
-    void visit(AdditionExpression additionExpression);
-    void visit(SubtractionExpression subtractionExpression);
-    void visit(MultiplicationExpression multiplicationExpression);
-    void visit(DivisionExpression divisionExpression);
-    void visit(CurrencyCastExpression currencyCastExpression);
-    void visit(CurrencyConversionExpression currencyConversionExpression);
-    void visit(NegationExpression negationExpression);
-    void visit(MinusExpression minusExpression);
-    void visit(AccessExpression accessExpression);
-    void visit(FunctionCallExpression functionCallExpression);
-    void visit(IdentifierExpression identifierExpression);
+    void visit(OrExpression orExpression) throws Exception;
+    void visit(AndExpression andExpression) throws Exception;
+    void visit(GreaterExpression greaterExpression) throws Exception;
+    void visit(LesserExpression lesserExpression) throws Exception;
+    void visit(EqualExpression equalExpression) throws Exception;
+    void visit(NotEqualExpression notEqualExpression) throws Exception;
+    void visit(GreaterOrEqualExpression greaterOrEqualExpression) throws Exception;
+    void visit(LesserOrEqualExpression lesserOrEqualExpression) throws Exception;
+    void visit(AdditionExpression additionExpression) throws Exception;
+    void visit(SubtractionExpression subtractionExpression) throws Exception;
+    void visit(MultiplicationExpression multiplicationExpression) throws Exception;
+    void visit(DivisionExpression divisionExpression) throws Exception;
+    void visit(CurrencyCastExpression currencyCastExpression) throws Exception;
+    void visit(CurrencyConversionExpression currencyConversionExpression) throws Exception;
+    void visit(NegationExpression negationExpression) throws Exception;
+    void visit(MinusExpression minusExpression) throws Exception;
+    void visit(AccessExpression accessExpression) throws Exception;
+    void visit(FunctionCallExpression functionCallExpression) throws Exception;
+    void visit(IdentifierExpression identifierExpression) throws Exception;
 
     void visit(IntPrimitive intPrimitive);
     void visit(FloatPrimitive floatPrimitive);
@@ -50,7 +50,7 @@ public interface Visitor {
     void visit(BoolPrimitive boolPrimitive);
     void visit(CurrencyPrimitive currencyPrimitive);
 
-    void visit(PrintFunction printFunction);
-    void visit(GetBalanceMethod getBalanceMethod);
-    void visit(GetCurrencyMethod getCurrencyMethod);
+    void visit(PrintFunction printFunction) throws Exception;
+    void visit(GetBalanceMethod getBalanceMethod) throws Exception;
+    void visit(GetCurrencyMethod getCurrencyMethod) throws Exception;
 }

@@ -1,6 +1,7 @@
 package currex.interpreter;
 
 import currex.interpreter.builtin.*;
+import currex.interpreter.error.*;
 import currex.structure.components.Block;
 import currex.structure.components.FunctionDefinition;
 import currex.structure.components.Parameter;
@@ -23,6 +24,7 @@ public class Interpreter implements Interpretable, Visitor {
     private final Map<String, FunctionDefinition> functionDefinitions = new HashMap<>(Functions.FUNCTIONS);
     private final ConversionTable conversionTable;
     private final PrintStream printer;
+    private final InterpreterErrorHandler errorHandler;
     private Value lastResult = null;
     private boolean isReturn = false;
     private boolean isIfStatement = false;
@@ -31,22 +33,24 @@ public class Interpreter implements Interpretable, Visitor {
     public Interpreter(ConversionTable conversionTable, PrintStream printer) {
         this.conversionTable = conversionTable;
         this.printer = printer;
+        this.errorHandler = new InterpreterErrorHandler();
     }
 
     @Override
-    public void run(Program program) {
+    public void run(Program program) throws Exception {
         visit(program);
     }
 
     @Override
-    public void visit(Program program) {
+    public void visit(Program program) throws Exception {
         functionDefinitions.putAll(program.functionDefinitions());
         FunctionCallExpression main = new FunctionCallExpression(CurrexConfig.MAIN_FUNCTION_NAME, List.of());
+
         main.accept(this);
     }
 
     @Override
-    public void visit(Block block) {
+    public void visit(Block block) throws Exception {
         for (Statement statement : block.statementList()) {
             statement.accept(this);
             if (isReturn)  {
@@ -67,17 +71,18 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(DeclarationStatement declarationStatement) {
+    public void visit(DeclarationStatement declarationStatement) throws Exception {
         declarationStatement.expression().accept(this);
         if (lastResult.valueType() != declarationStatement.type()) {
-            System.out.println("INVALID VARIABLE TYPE");
+            errorHandler.handleInterpreterError(new InvalidVariableTypeError("INVALID VARIABLE OF TYPE " +
+                    lastResult.valueType().name() + "!"));
         }
         contextManager.addVariable(declarationStatement.name(), new Value(
                 declarationStatement.type(), lastResult.value()));
     }
 
     @Override
-    public void visit(AssignmentStatement assignmentStatement) {
+    public void visit(AssignmentStatement assignmentStatement) throws Exception {
         assignmentStatement.left().accept(this);
         assignmentStatement.right().accept(this);
         if (lastResult != null) {
@@ -90,7 +95,7 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(ReturnStatement returnStatement) {
+    public void visit(ReturnStatement returnStatement) throws Exception {
         if (returnStatement.expression() != null) {
             returnStatement.expression().accept(this);
             isReturn = true;
@@ -98,11 +103,10 @@ public class Interpreter implements Interpretable, Visitor {
         else {
             copyLastResult();
         }
-        System.out.println("RETURN:" + lastResult);
     }
 
     @Override
-    public void visit(WhileStatement whileStatement) {
+    public void visit(WhileStatement whileStatement) throws Exception {
         whileStatement.expression().accept(this);
         Value check = copyLastResult();
         BoolPrimitive checkValue = (BoolPrimitive) check.value();
@@ -116,7 +120,7 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(IfStatement ifStatement) {
+    public void visit(IfStatement ifStatement) throws Exception {
         List<ElseStatement> elseStatements = ifStatement.conditionalStatements();
         for (int i = 0; i < elseStatements.size(); i++) {
             if (isIfStatement) {
@@ -136,11 +140,13 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(ElseStatement elseStatement) {
+    public void visit(ElseStatement elseStatement) throws Exception {
         elseStatement.expression().accept(this);
         Value check = copyLastResult();
         if (check.valueType() != PrimitiveType.BOOL) {
-            System.out.println("Evaluated expression does not give a bool value");
+            errorHandler.handleInterpreterError(new InvalidBoolValueError(
+                    "EVALUATED EXPRESSION DOES NOT GIVE A BOOL VALUE!"
+            ));
         }
         BoolPrimitive leftBool = (BoolPrimitive) check.value();
         if (leftBool.value()) {
@@ -152,7 +158,7 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(OrExpression orExpression) {
+    public void visit(OrExpression orExpression) throws Exception {
         orExpression.left().accept(this);
         Value left = copyLastResult();
         if (left.valueType() == PrimitiveType.BOOL) {
@@ -174,11 +180,11 @@ public class Interpreter implements Interpretable, Visitor {
             }
             return;
         }
-        System.out.println("OR STATEMENT CANNOT BE EVALUATED!");
+        errorHandler.handleInterpreterError(new InvalidBoolValueError("OR STATEMENT CANNOT BE EVALUATED!"));
     }
 
     @Override
-    public void visit(AndExpression andExpression) {
+    public void visit(AndExpression andExpression) throws Exception {
         andExpression.left().accept(this);
         Value left = copyLastResult();
         if (left.valueType() == PrimitiveType.BOOL) {
@@ -200,11 +206,11 @@ public class Interpreter implements Interpretable, Visitor {
             }
             return;
         }
-        System.out.println("AND STATEMENT CANNOT BE EVALUATED!");
+        errorHandler.handleInterpreterError(new InvalidBoolValueError("AND STATEMENT CANNOT BE EVALUATED!"));
     }
 
     @Override
-    public void visit(EqualExpression equalExpression) {
+    public void visit(EqualExpression equalExpression) throws Exception {
         equalExpression.left().accept(this);
         Value left = copyLastResult();
         equalExpression.right().accept(this);
@@ -234,7 +240,7 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(NotEqualExpression notEqualExpression) {
+    public void visit(NotEqualExpression notEqualExpression) throws Exception {
         notEqualExpression.left().accept(this);
         Value left = copyLastResult();
         notEqualExpression.right().accept(this);
@@ -264,7 +270,7 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(GreaterExpression greaterExpression) {
+    public void visit(GreaterExpression greaterExpression) throws Exception {
         greaterExpression.left().accept(this);
         Value left = copyLastResult();
         greaterExpression.right().accept(this);
@@ -289,7 +295,7 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(LesserExpression lesserExpression) {
+    public void visit(LesserExpression lesserExpression) throws Exception {
         lesserExpression.left().accept(this);
         Value left = copyLastResult();
         lesserExpression.right().accept(this);
@@ -314,7 +320,7 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(GreaterOrEqualExpression greaterOrEqualExpression) {
+    public void visit(GreaterOrEqualExpression greaterOrEqualExpression) throws Exception {
         greaterOrEqualExpression.left().accept(this);
         Value left = copyLastResult();
         greaterOrEqualExpression.right().accept(this);
@@ -339,7 +345,7 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(LesserOrEqualExpression lesserOrEqualExpression) {
+    public void visit(LesserOrEqualExpression lesserOrEqualExpression) throws Exception {
         lesserOrEqualExpression.left().accept(this);
         Value left = copyLastResult();
         lesserOrEqualExpression.right().accept(this);
@@ -364,7 +370,7 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(AdditionExpression additionExpression) {
+    public void visit(AdditionExpression additionExpression) throws Exception {
         additionExpression.left().accept(this);
         Value left = copyLastResult();
         additionExpression.right().accept(this);
@@ -380,6 +386,13 @@ public class Interpreter implements Interpretable, Visitor {
             FloatPrimitive rightValue = (FloatPrimitive) right.value();
             lastResult = new Value(PrimitiveType.FLOAT, new FloatPrimitive(leftValue.value() + rightValue.value()));
         }
+        else if (left.valueType() == PrimitiveType.STRING && right.valueType() == PrimitiveType.STRING) {
+            StringPrimitive leftValue = (StringPrimitive) left.value();
+            StringPrimitive rightValue = (StringPrimitive) right.value();
+            String result = leftValue.value().substring(0, leftValue.value().length()-1) +
+                    rightValue.value().substring(1);
+            lastResult = new Value(PrimitiveType.STRING, new StringPrimitive(result));
+        }
         else if (left.valueType() == PrimitiveType.CURRENCY && right.valueType() == PrimitiveType.CURRENCY) {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
@@ -390,16 +403,18 @@ public class Interpreter implements Interpretable, Visitor {
                 lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
-                System.out.println("INCOMPATIBLE CURRENCY TYPES");
+                errorHandler.handleInterpreterError(new IncompatibleTypesError("CANNOT ADD " +
+                        currencyLeft.getName() + " TO " + currencyRight.getName() + "!"));
             }
         }
         else {
-            System.out.println("ADDITION NOT POSSIBLE");
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("CANNOT ADD " +
+                    left.valueType().name() + " TO " + right.valueType().name() + "!"));
         }
     }
 
     @Override
-    public void visit(SubtractionExpression subtractionExpression) {
+    public void visit(SubtractionExpression subtractionExpression) throws Exception {
         subtractionExpression.left().accept(this);
         Value left = copyLastResult();
         subtractionExpression.right().accept(this);
@@ -425,16 +440,18 @@ public class Interpreter implements Interpretable, Visitor {
                 lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
-                System.out.println("INCOMPATIBLE CURRENCY TYPES");
+                errorHandler.handleInterpreterError(new IncompatibleTypesError("CANNOT SUBTRACT " +
+                        currencyLeft.getName() + " FROM " + currencyRight.getName() + "!"));
             }
         }
         else {
-            System.out.println("SUBTRACTION NOT POSSIBLE");
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("CANNOT SUBTRACT " +
+                    left.valueType().name() + " FROM " + right.valueType().name() + "!"));
         }
     }
 
     @Override
-    public void visit(MultiplicationExpression multiplicationExpression) {
+    public void visit(MultiplicationExpression multiplicationExpression) throws Exception {
         multiplicationExpression.left().accept(this);
         Value left = copyLastResult();
         multiplicationExpression.right().accept(this);
@@ -460,16 +477,18 @@ public class Interpreter implements Interpretable, Visitor {
                 lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
-                System.out.println("INCOMPATIBLE CURRENCY TYPES");
+                errorHandler.handleInterpreterError(new IncompatibleTypesError("CANNOT MULTIPLY " +
+                        currencyLeft.getName() + " BY " + currencyRight.getName() + "!"));
             }
         }
         else {
-            System.out.println("MULTIPLICATION NOT POSSIBLE");
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("CANNOT MULTIPLY " +
+                    left.valueType().name() + " BY " + right.valueType().name() + "!"));
         }
     }
 
     @Override
-    public void visit(DivisionExpression divisionExpression) {
+    public void visit(DivisionExpression divisionExpression) throws Exception {
         divisionExpression.left().accept(this);
         Value left = copyLastResult();
         divisionExpression.right().accept(this);
@@ -478,7 +497,7 @@ public class Interpreter implements Interpretable, Visitor {
             IntPrimitive leftValue = (IntPrimitive) left.value();
             IntPrimitive rightValue = (IntPrimitive) right.value();
             if (rightValue.value().equals(0)) {
-                System.out.println("DIVISION BY ZERO NOT POSSIBLE");
+                errorHandler.handleInterpreterError(new ZeroDivisionError("UNHANDLED DIVISION BY ZERO!"));
             }
             lastResult = new Value(PrimitiveType.INTEGER, new IntPrimitive(leftValue.value() / rightValue.value()));
         }
@@ -487,7 +506,7 @@ public class Interpreter implements Interpretable, Visitor {
             FloatPrimitive leftValue = (FloatPrimitive) left.value();
             FloatPrimitive rightValue = (FloatPrimitive) right.value();
             if (rightValue.value().equals(0.0)) {
-                System.out.println("DIVISION BY ZERO NOT POSSIBLE");
+                errorHandler.handleInterpreterError(new ZeroDivisionError("UNHANDLED DIVISION BY ZERO!"));
             }
             lastResult = new Value(PrimitiveType.FLOAT, new FloatPrimitive(leftValue.value() / rightValue.value()));
         }
@@ -495,7 +514,7 @@ public class Interpreter implements Interpretable, Visitor {
             CurrencyPrimitive currencyLeft = (CurrencyPrimitive) left.value();
             CurrencyPrimitive currencyRight = (CurrencyPrimitive) right.value();
             if (currencyRight.getValue().equals(BigDecimal.valueOf(0.0))) {
-                System.out.println("DIVISION BY ZERO NOT POSSIBLE");
+                errorHandler.handleInterpreterError(new ZeroDivisionError("UNHANDLED DIVISION BY ZERO!"));
             }
             if (currencyLeft.getName().equals(currencyRight.getName())) {
                 BigDecimal currencyValue = currencyLeft.getValue().divide(currencyRight.getValue(), RoundingMode.HALF_DOWN);
@@ -504,16 +523,18 @@ public class Interpreter implements Interpretable, Visitor {
                 lastResult = new Value(PrimitiveType.CURRENCY, primitive);
             }
             else {
-                System.out.println("INCOMPATIBLE CURRENCY TYPES");
+                errorHandler.handleInterpreterError(new IncompatibleTypesError("CANNOT DIVIDE " +
+                        currencyLeft.getName() + " BY " + currencyRight.getName() + "!"));
             }
         }
         else {
-            System.out.println("DIVISION NOT POSSIBLE");
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("CANNOT DIVIDE " +
+                    left.valueType().name() + " BY " + right.valueType().name() + "!"));
         }
     }
 
     @Override
-    public void visit(CurrencyCastExpression currencyCastExpression) {
+    public void visit(CurrencyCastExpression currencyCastExpression) throws Exception {
         currencyCastExpression.left().accept(this);
         Value left = copyLastResult();
         currencyCastExpression.right().accept(this);
@@ -529,17 +550,20 @@ public class Interpreter implements Interpretable, Visitor {
                 rightValue = rightCurrency.getName();
             }
             else {
-                System.out.println("CONVERTION VALUE CANNOT BE OF TYPE " + right.valueType().name());
+                errorHandler.handleInterpreterError(new InvalidCurrencyNameError(
+                        "CONVERTION VALUE CANNOT BE OF TYPE " + right.valueType().name()
+                ));
             }
             lastResult = new Value(PrimitiveType.CURRENCY, new CurrencyPrimitive(leftValue.getValue(), rightValue));
         }
         else {
-            System.out.println("CURRENCY CASTING CANNOT BE APPLIED TO NON-CURRENCY VALUES!");
+            errorHandler.handleInterpreterError(new IncompatibleTypesError(
+                    "CURRENCY CASTING CANNOT BE APPLIED TO NON-CURRENCY VALUES!"));
         }
     }
 
     @Override
-    public void visit(CurrencyConversionExpression currencyConversionExpression) {
+    public void visit(CurrencyConversionExpression currencyConversionExpression) throws Exception {
         currencyConversionExpression.left().accept(this);
         Value left = copyLastResult();
         currencyConversionExpression.right().accept(this);
@@ -555,7 +579,9 @@ public class Interpreter implements Interpretable, Visitor {
                 rightValue = rightCurrency.getName();
             }
             else {
-                System.out.println("CONVERTION VALUE CANNOT BE OF TYPE " + right.valueType().name());
+                errorHandler.handleInterpreterError(new InvalidCurrencyNameError(
+                        "CONVERTION VALUE CANNOT BE OF TYPE " + right.valueType().name()
+                ));
             }
             int conversionRateColumn = conversionTable.getColumnCurrencies().indexOf(rightValue);
             int conversionRateRow = conversionTable.getRowCurrencies().indexOf(leftValue.getName());
@@ -565,12 +591,12 @@ public class Interpreter implements Interpretable, Visitor {
             lastResult = new Value(PrimitiveType.CURRENCY, new CurrencyPrimitive(currencyValue, rightValue));
         }
         else {
-            System.out.println("CURRENCY CONVERSION CANNOT BE APPLIED TO NON-CURRENCY VALUES!");
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("CURRENCY CONVERSION CANNOT BE APPLIED TO NON-CURRENCY VALUES!"));
         }
     }
 
     @Override
-    public void visit(NegationExpression negationExpression) {
+    public void visit(NegationExpression negationExpression) throws Exception {
         negationExpression.expression().accept(this);
         Value result = copyLastResult();
         if (result.valueType() == PrimitiveType.BOOL) {
@@ -578,12 +604,13 @@ public class Interpreter implements Interpretable, Visitor {
             lastResult = new Value(PrimitiveType.BOOL, !boolValue.value());
         }
         else {
-            System.out.println("NEGATION NOT POSSIBLE");
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("NEGATION NOT POSSIBLE FOR TYPE" +
+                    result.valueType().name() + "!"));
         }
     }
 
     @Override
-    public void visit(MinusExpression minusExpression) {
+    public void visit(MinusExpression minusExpression) throws Exception {
         minusExpression.expression().accept(this);
         Value result = copyLastResult();
         if (result.valueType() == PrimitiveType.INTEGER) {
@@ -600,26 +627,29 @@ public class Interpreter implements Interpretable, Visitor {
             lastResult = new Value(result.valueType(), new CurrencyPrimitive(value, currencyValue.getName()));
         }
         else {
-            System.out.println("NEGATION NOT POSSIBLE");
+            errorHandler.handleInterpreterError(new IncompatibleTypesError("NEGATION NOT POSSIBLE FOR TYPE" +
+                    result.valueType().name() + "!"));
         }
     }
 
     @Override
-    public void visit(AccessExpression accessExpression) {
+    public void visit(AccessExpression accessExpression) throws Exception {
         accessExpression.left().accept(this);
         Value left = copyLastResult();
         if (left.value().getClass() != CurrencyPrimitive.class) {
-            System.out.println("METHODS ARE NOT APPLICABLE TO NON-CURRENCY VALUES!");
+            errorHandler.handleInterpreterError(new InvalidVariableTypeError("METHODS ARE NOT APPLICABLE TO NON-CURRENCY VALUES!"));
         }
         FunctionCallExpression functionCall;
         if (accessExpression.right().getClass() != FunctionCallExpression.class) {
-            System.out.println("ONLY METHOD CALLS ARE ALLOWED!");
+            errorHandler.handleInterpreterError(new InvalidMethodCallError("ONLY METHOD CALLS ARE ALLOWED!"));
         }
         else {
             functionCall = (FunctionCallExpression) accessExpression.right();
             FunctionDefinition function = functionDefinitions.get(functionCall.name());
             if (function == null) {
-                System.out.println("THIS METHOD DOES NOT EXIST!");
+                errorHandler.handleInterpreterError(new FunctionDoesNotExistError(
+                        "METHOD WITH NAME" + functionCall.name() + "DOES NOT EXIST!"
+                ));
                 return;
             }
             FunctionDefinition tempFunc = new FunctionDefinition(function.returnType(),
@@ -634,13 +664,21 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(FunctionCallExpression functionCallExpression) {
+    public void visit(FunctionCallExpression functionCallExpression) throws Exception {
         if (!functionDefinitions.containsKey(functionCallExpression.name())) {
-            System.out.println("NO FUNCTION WITH THIS NAME ERROR");
+            if (functionCallExpression.name().equals(CurrexConfig.MAIN_FUNCTION_NAME)) {
+                errorHandler.handleInterpreterError(new MainFunctionNotDefinedError("MAIN FUNCTION WAS NOT DEFINED!"));
+            }
+            errorHandler.handleInterpreterError(new FunctionDoesNotExistError("NO FUNCTION WITH THIS NAME ERROR"));
         }
         FunctionDefinition functionDefinition = functionDefinitions.get(functionCallExpression.name());
         if (functionDefinition.parameters().size() != functionCallExpression.arguments().size()) {
-            System.out.println("INVALID NUMBER OF ARGUMENTS FOR FUNCTION XYZ, EXPECTED: Y BUT RECEIVED: X");
+            errorHandler.handleInterpreterError(new InvalidFunctionDefinitionError(
+                    "INVALID NUMBER OF ARGUMENTS FOR FUNCTION " +
+                            functionDefinition.name() +
+                            "EXPECTED: " + functionDefinition.parameters().size() +
+                            " BUT RECEIVED: " + functionCallExpression.arguments().size() + "!"
+            ));
         }
         List<Expression> functionArguments = functionCallExpression.arguments();
         contextManager.addContext(new Context());
@@ -651,7 +689,7 @@ public class Interpreter implements Interpretable, Visitor {
                 contextManager.addVariable(param.name(), new Value(PrimitiveType.STRING, lastResult.value().toString()));
             }
             else if (lastResult.valueType() != param.type()) {
-                System.out.println("INVALID TYPE PROVIDED FOR PARAMETER " + param.name());
+                errorHandler.handleInterpreterError(new InvalidVariableTypeError("INVALID TYPE PROVIDED FOR PARAMETER " + param.name()));
             }
             else {
                 contextManager.addVariable(param.name(), new Value(param.type(), lastResult.value()));
@@ -662,16 +700,17 @@ public class Interpreter implements Interpretable, Visitor {
             lastResult = null;
         }
         else if (lastResult.valueType() != functionDefinition.returnType()) {
-            System.out.println("INVALID RETURN TYPE");
+            errorHandler.handleInterpreterError(new InvalidReturnValueError("INVALID RETURN TYPE, EXPECTED " +
+                    functionDefinition.returnType().name() + " BUT GOT " + lastResult.valueType().name() + " INSTEAD!"));
         }
         else if (lastResult.value() == null) {
-            System.out.println("NO RETURN VALUE SPECIFIED");
+            errorHandler.handleInterpreterError(new InvalidReturnValueError("NO RETURN VALUE SPECIFIED!"));
         }
         contextManager.removeCurrentContext();
     }
 
     @Override
-    public void visit(IdentifierExpression identifierExpression) {
+    public void visit(IdentifierExpression identifierExpression) throws Exception {
         if (conversionTable.getColumnCurrencies().contains(identifierExpression.name())) {
             BigDecimal temporaryValue = BigDecimal.valueOf(0.0);
             lastResult = new Value(PrimitiveType.CURRENCY, new CurrencyPrimitive(temporaryValue, identifierExpression.name()));
@@ -679,7 +718,9 @@ public class Interpreter implements Interpretable, Visitor {
         }
         Value value = contextManager.fetchVariable(identifierExpression.name());
         if (value == null) {
-            System.out.println("VariableDoesNotExistError(VARIABLE " + identifierExpression.name() + " DOES NOT EXIST IN ANY CONTEXT");
+            errorHandler.handleInterpreterError(new VariableDoesNotExistError(
+                    "VARIABLE " + identifierExpression.name() + " DOES NOT EXIST IN ANY CONTEXT!"
+            ));
         }
         else {
             lastResult = value;
@@ -712,19 +753,19 @@ public class Interpreter implements Interpretable, Visitor {
     }
 
     @Override
-    public void visit(PrintFunction printFunction) {
+    public void visit(PrintFunction printFunction) throws Exception {
         Value valueToPrint = contextManager.fetchVariable("valueToPrint");
         printer.println(valueToPrint.value().toString());
     }
 
     @Override
-    public void visit(GetBalanceMethod getBalanceMethod) {
+    public void visit(GetBalanceMethod getBalanceMethod) throws Exception {
         CurrencyPrimitive balance = (CurrencyPrimitive) contextManager.fetchVariable("currencyBalance").value();
         lastResult = new Value(PrimitiveType.FLOAT, balance.getValue());
     }
 
     @Override
-    public void visit(GetCurrencyMethod getCurrencyMethod) {
+    public void visit(GetCurrencyMethod getCurrencyMethod) throws Exception {
         CurrencyPrimitive balance = (CurrencyPrimitive) contextManager.fetchVariable("currencyBalance").value();
         lastResult = new Value(PrimitiveType.STRING, balance.getName());
     }

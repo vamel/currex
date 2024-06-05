@@ -9,7 +9,7 @@ import java.util.List;
 public record Block(List<Statement> statementList) implements Visitable {
 
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(Visitor visitor) throws Exception {
         visitor.visit(this);
     }
 }
