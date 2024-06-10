@@ -1,0 +1,14 @@
+main() {
+    int i = 90;
+    if (i < 5) {
+        print(i);
+        i = i + 1;
+    }
+    else if (i > 50 && i < 100) {
+        print("inside else if");
+    }
+    else {
+        i = 10000;
+        print(i);
+    }
+}

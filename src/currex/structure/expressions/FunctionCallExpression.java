@@ -6,7 +6,7 @@ import java.util.List;
 
 public record FunctionCallExpression(String name, List<Expression> arguments) implements Expression {
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(Visitor visitor) throws Exception {
         visitor.visit(this);
     }
 }

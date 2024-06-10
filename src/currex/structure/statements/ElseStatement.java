@@ -7,7 +7,7 @@ import currex.visitor.Visitor;
 public record ElseStatement(Expression expression, Block block) implements Statement {
 
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(Visitor visitor) throws Exception {
         visitor.visit(this);
     }
 }

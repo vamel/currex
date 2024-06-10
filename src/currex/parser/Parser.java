@@ -169,7 +169,7 @@ public class Parser {
         }
         consumeToken();
         if (!checkTokenType(TokenType.IDENTIFIER)) {
-            errorHandler.handleParserError(new InvalidIdentifierError("INVALID PARAMETER NAME!"),
+            errorHandler.handleParserError(new InvalidIdentifierError("INVALID IDENTIFIER NAME!"),
                     new Position(currentToken.getPosition()));
         }
         String variableName = (String) currentToken.getValue();
@@ -412,7 +412,8 @@ public class Parser {
         while (checkTokenType(TokenType.AT) || checkTokenType(TokenType.ARROW)) {
             tokenType = currentToken.getTokenType();
             consumeToken();
-            Expression rightExpression = parseIdentifierOrFunctionCall();
+//            Expression rightExpression = parseIdentifierOrFunctionCall();
+            Expression rightExpression = parseUnaryExpression();
             if (rightExpression == null) {
                 errorHandler.handleParserError(new MissingExpressionError("MISSING SECOND EXPRESSION!"),
                         new Position(currentToken.getPosition()));

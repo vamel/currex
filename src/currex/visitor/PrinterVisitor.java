@@ -1,5 +1,8 @@
 package currex.visitor;
 
+import currex.interpreter.builtin.GetBalanceMethod;
+import currex.interpreter.builtin.GetCurrencyMethod;
+import currex.interpreter.builtin.PrintFunction;
 import currex.structure.components.Block;
 import currex.structure.components.FunctionDefinition;
 import currex.structure.components.Parameter;
@@ -19,7 +22,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(Program program) {
+    public void visit(Program program) throws Exception {
         System.out.println(ident.repeat(identation) +
                 "<Program>");
         for (FunctionDefinition functionDefinition: program.functionDefinitions().values()) {
@@ -28,7 +31,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(Block block) {
+    public void visit(Block block) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<Block>");
@@ -39,7 +42,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(FunctionDefinition functionDefinition) {
+    public void visit(FunctionDefinition functionDefinition) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<FunctionDefinition return_type=" + functionDefinition.returnType() +
@@ -61,7 +64,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(DeclarationStatement declarationStatement) {
+    public void visit(DeclarationStatement declarationStatement) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<DeclarationStatement type=" + declarationStatement.type() +
@@ -71,7 +74,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(AssignmentStatement assignmentStatement) {
+    public void visit(AssignmentStatement assignmentStatement) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<AssignmentStatement>");
@@ -81,7 +84,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(ReturnStatement returnStatement) {
+    public void visit(ReturnStatement returnStatement) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<ReturnStatement>");
@@ -90,7 +93,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(WhileStatement whileStatement) {
+    public void visit(WhileStatement whileStatement) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<WhileStatement>");
@@ -100,7 +103,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(IfStatement ifStatement) {
+    public void visit(IfStatement ifStatement) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<IfStatement>");
@@ -111,7 +114,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(ElseStatement elseStatement) {
+    public void visit(ElseStatement elseStatement) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<ElseStatement>");
@@ -123,7 +126,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(OrExpression orExpression) {
+    public void visit(OrExpression orExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<OrExpression>");
@@ -133,7 +136,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(AndExpression andExpression) {
+    public void visit(AndExpression andExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<AndExpression>");
@@ -143,7 +146,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(GreaterExpression greaterExpression) {
+    public void visit(GreaterExpression greaterExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<GreaterExpression>");
@@ -153,7 +156,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(LesserExpression lesserExpression) {
+    public void visit(LesserExpression lesserExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<LesserExpression>");
@@ -163,7 +166,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(EqualExpression equalExpression) {
+    public void visit(EqualExpression equalExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<EqualExpression>");
@@ -173,7 +176,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(NotEqualExpression notEqualExpression) {
+    public void visit(NotEqualExpression notEqualExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<NotEqualExpression>");
@@ -183,7 +186,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(GreaterOrEqualExpression greaterOrEqualExpression) {
+    public void visit(GreaterOrEqualExpression greaterOrEqualExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<GreaterOrEqualExpression>");
@@ -193,7 +196,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(LesserOrEqualExpression lesserOrEqualExpression) {
+    public void visit(LesserOrEqualExpression lesserOrEqualExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<LesserOrEqualExpression>");
@@ -203,7 +206,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(AdditionExpression additionExpression) {
+    public void visit(AdditionExpression additionExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<AdditionExpression>");
@@ -213,7 +216,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(SubtractionExpression subtractionExpression) {
+    public void visit(SubtractionExpression subtractionExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<SubtractionExpression>");
@@ -223,7 +226,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(MultiplicationExpression multiplication) {
+    public void visit(MultiplicationExpression multiplication) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<MultiplicationExpression>");
@@ -233,7 +236,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(DivisionExpression divisionExpression) {
+    public void visit(DivisionExpression divisionExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<DivisionExpression>");
@@ -243,7 +246,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(CurrencyCastExpression currencyCastExpression) {
+    public void visit(CurrencyCastExpression currencyCastExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<CurrencyCastExpression>");
@@ -253,7 +256,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(CurrencyConversionExpression currencyConversionExpression) {
+    public void visit(CurrencyConversionExpression currencyConversionExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<CurrencyConversionExpression>");
@@ -263,7 +266,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(NegationExpression negationExpression) {
+    public void visit(NegationExpression negationExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<NegationExpression>");
@@ -272,7 +275,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(MinusExpression minusExpression) {
+    public void visit(MinusExpression minusExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<MinusExpression>");
@@ -281,7 +284,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(AccessExpression accessExpression) {
+    public void visit(AccessExpression accessExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<AccessExpression>");
@@ -291,7 +294,7 @@ public class PrinterVisitor implements Visitor {
     }
 
     @Override
-    public void visit(FunctionCallExpression functionCallExpression) {
+    public void visit(FunctionCallExpression functionCallExpression) throws Exception {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
                 "<FunctionCallExpression name=" + functionCallExpression.name() + ">");
@@ -345,8 +348,29 @@ public class PrinterVisitor implements Visitor {
     public void visit(CurrencyPrimitive currencyPrimitive) {
         increaseIdentation();
         System.out.println(ident.repeat(identation) +
-                "<CurrencyPrimitive value=" + currencyPrimitive.value() +
-                " type=" + currencyPrimitive.name() + ">");
+                "<CurrencyPrimitive value=" + currencyPrimitive.getValue() +
+                " type=" + currencyPrimitive.getName() + ">");
+        decreaseIdendation();
+    }
+
+    @Override
+    public void visit(PrintFunction printFunction) {
+        increaseIdentation();
+        System.out.println("<PrintStatement>");
+        decreaseIdendation();
+    }
+
+    @Override
+    public void visit(GetBalanceMethod getBalanceMethod) {
+        increaseIdentation();
+        System.out.println("<GetBalance method>");
+        decreaseIdendation();
+    }
+
+    @Override
+    public void visit(GetCurrencyMethod getCurrencyMethod) {
+        increaseIdentation();
+        System.out.println("<GetCurrency method>");
         decreaseIdendation();
     }
 

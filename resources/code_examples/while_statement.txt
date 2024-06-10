@@ -1,0 +1,7 @@
+main() {
+    float val = 0.99;
+    while (val < 10.0) {
+        print(val);
+        val = val + 1.0;
+    }
+}

@@ -436,8 +436,8 @@ public class LexerTest {
         Source reader = new Source(new FileReader("resources/lexer/empty_file.txt"));
         Lexer lexer = new Lexer(reader);
 
-        UnknownTokenError e = Assert.assertThrows(UnknownTokenError.class, lexer::fetchToken);
-        Assert.assertTrue(e.getMessage().contains("UNKNOWN TOKEN FOUND!"));
+        Token token = lexer.fetchToken();
+        Assert.assertEquals(TokenType.EOF, token.getTokenType());
     }
 
     @Test

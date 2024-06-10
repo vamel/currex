@@ -1,0 +1,8 @@
+main() {
+    int a = 2;
+    string b = sum();
+}
+
+int sum() {
+    return "value";
+}

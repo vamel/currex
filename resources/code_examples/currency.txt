@@ -1,0 +1,28 @@
+main() {
+    currency first = 4.40 EUR;
+    currency second = 2.20 PLN;
+    funkcja(first, second);
+    currency third = convert(first);
+}
+
+currency convert(currency curr) {
+    currency currX = 10000 PLN;
+    currency currSum = currX / (currX + curr @ PLN);
+    return currSum @ USD;
+}
+
+currency funkcja(currency waluta1, currency waluta2) {
+    if (waluta1 == 4.40 EUR) {
+    print(waluta2);
+    waluta1 = waluta1 + 1 EUR;
+    } else if (waluta1 == 0.00 EUR) {
+    waluta1 = 1000 EUR;
+    } else if (waluta1 == 10.00 EUR) {
+    waluta1 = -500 EUR;
+    }
+    else {
+    waluta1 = waluta1 - 1 EUR;
+    }
+    waluta2 = waluta1 @ USD - 4.50 USD;
+    return waluta2;
+}
