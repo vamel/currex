@@ -74,7 +74,10 @@ public class Interpreter implements Interpretable, Visitor {
     @Override
     public void visit(DeclarationStatement declarationStatement) throws Exception {
         declarationStatement.expression().accept(this);
-        if (lastResult.valueType() != declarationStatement.type()) {
+        if (lastResult == null) {
+            throw new InvalidReturnValueError("CANNOT ASSIGN A VALUE FROM FUNCTION WITHOUT A RETURN VALUE!");
+        }
+        else if (lastResult.valueType() != declarationStatement.type()) {
             errorHandler.handleInterpreterError(new InvalidVariableTypeError("INVALID VARIABLE OF TYPE " +
                     lastResult.valueType().name() + "!"));
         }
@@ -92,6 +95,9 @@ public class Interpreter implements Interpretable, Visitor {
                 String variableName = ((IdentifierExpression) assignmentStatement.left()).name();
                 contextManager.updateVariable(variableName, rightValue);
             }
+        }
+        else {
+            throw new InvalidReturnValueError("CANNOT ASSIGN A VALUE FROM FUNCTION WITHOUT A RETURN VALUE!");
         }
     }
 
