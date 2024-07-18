@@ -1,0 +1,4 @@
+main() {
+    currency a = 10.99 EUR;
+    return a.getValue();
+}

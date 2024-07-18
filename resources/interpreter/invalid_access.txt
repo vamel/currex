@@ -1,0 +1,4 @@
+main() {
+    currency a = 10 PLN;
+    return a.name;
+}

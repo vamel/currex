@@ -1,0 +1,5 @@
+main() {
+    currency a = 1.0 PLN;
+    currency b = 14.89 USD;
+    return a > b;
+}

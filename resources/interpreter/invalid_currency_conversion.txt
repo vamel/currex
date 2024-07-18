@@ -1,0 +1,5 @@
+main() {
+    currency a = 10.0 PLN;
+    string x = "x";
+    return a -> x;
+}
