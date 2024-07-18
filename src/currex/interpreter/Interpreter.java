@@ -108,7 +108,7 @@ public class Interpreter implements Interpretable, Visitor {
             isReturn = true;
         }
         else {
-            copyLastResult();
+            copyLastResult(); // lastResult = null;
         }
     }
 

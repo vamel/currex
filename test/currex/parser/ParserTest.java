@@ -176,8 +176,8 @@ public class ParserTest {
         Statement statement = block.statementList().get(0);
         Assert.assertEquals(CurrencyPrimitive.class, statement.getClass());
         CurrencyPrimitive primitive = (CurrencyPrimitive) statement;
-        Assert.assertEquals(BigDecimal.valueOf(1.50), primitive.value());
-        Assert.assertEquals("XYZ", primitive.name());
+        Assert.assertEquals(BigDecimal.valueOf(1.50), primitive.getValue());
+        Assert.assertEquals("XYZ", primitive.getName());
     }
 
     @Test
@@ -348,8 +348,8 @@ public class ParserTest {
         Expression argument = functionCall.arguments().get(0);
         Assert.assertEquals(CurrencyPrimitive.class, argument.getClass());
         CurrencyPrimitive currency = (CurrencyPrimitive) argument;
-        Assert.assertEquals(BigDecimal.valueOf(10.0), currency.value());
-        Assert.assertEquals("ABC", currency.name());
+        Assert.assertEquals(BigDecimal.valueOf(10.0), currency.getValue());
+        Assert.assertEquals("ABC", currency.getName());
     }
 
     @Test

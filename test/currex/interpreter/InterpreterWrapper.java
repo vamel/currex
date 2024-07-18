@@ -10,7 +10,7 @@ import currex.structure.table.TableStatement;
 import java.io.FileReader;
 import java.io.PrintStream;
 
-public class InterpreterMock {
+public class InterpreterWrapper {
     Source source = new Source(new FileReader("resources/interpreter/currency_table.txt"));
     Lexer lexer = new Lexer(source);
     TableParser tableParser = new TableParser(lexer);
@@ -19,7 +19,7 @@ public class InterpreterMock {
     PrintStream printStream = new PrintStream(System.out);
     Interpreter interpreter;
 
-    public InterpreterMock() throws Exception {
+    public InterpreterWrapper() throws Exception {
         interpreter = new Interpreter(conversionTable, printStream);
     }
 
